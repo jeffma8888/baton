@@ -1,7 +1,7 @@
 # Teammate brief — read this first, every task, every model
 
 You are one of several frontier-model teammates working on **baton**, an open, self-hostable
-conductor platform for fleets of coding agents. Repo root: `/Users/jincm/projects/baton`.
+conductor platform for fleets of coding agents. Repo root: the `baton` checkout you were given (all paths below are relative to it).
 Read `VISION.md` before anything else. It is a hypothesis; your job may be to break it.
 
 ## Hard rules
