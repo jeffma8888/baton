@@ -1,0 +1,13 @@
+# local operator state (teammate roster, scratch) -- never published
+.aki/
+PROMOTION.md
+*.local.md
+# os / editor
+.DS_Store
+.vscode/
+.idea/
+# python / node (future)
+__pycache__/
+.venv/
+node_modules/
+dist/
