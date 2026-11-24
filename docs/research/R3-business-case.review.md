@@ -271,3 +271,114 @@ Totals for R3's own citations (rows 1–35, 37–44; 43 rows): 35 S, 1 F (row 14
 - **The FAQ answers are honest.** Q2 ("We cannot promise the company survives; we can promise the software does") and Q3 (do not build on subscription arbitrage) say what a skeptical CTO needs to hear.
 - **The registry-level naming checks are correct and reproducible.** All nine candidate-registry results, the handles and the domain dates matched. Rejecting `baton` is right, and US trademark data now confirms it.
 - **The rule 5 hygiene is good.** No personal names, the customer logo list is not reproduced, and the operator is not referenced.
+
+## Re-verification of v3 (same reviewer)
+
+> Date: 2026-11-23.
+> - **Read:** v3 in full (286 lines, 44,648 bytes).
+> - **Re-fetched:** 11 sources that are new or newly inlined in v3.
+> - **Ran:** the `ritornello` checks the author could not: GitHub REST API, npm/PyPI/crates.io, RDAP/`whois`, and the USPTO tmsearch backend, with BATON as a control query.
+> - R3 not edited; git not run.
+
+### 1. Status of the 8 BLOCKING findings
+
+All eight original BLOCKING findings are FIXED. ADVISORY findings 9–19, 21 and 22 are addressed. Finding 20 (length) is partly addressed (R-f). Line numbers (L) refer to v3.
+
+| # | Finding | Status | Evidence in v3 | Residual |
+|---|---|---|---|---|
+| 1 | `ripieno` collides with a same-category product | FIXED | §5 L67 "**Rejected.**"; §E L135 "`ripieno` is dropped"; §5 method L64 adds the repository-name search | The new method was not fully applied to the replacement candidate. See N1. |
+| 2 | Press-release para 2: "only its own agent"; "acquired" | FIXED | §F L148: "Most vendors shipped a conductor for their own agent; the one cross-vendor surface lives inside a single code host's cloud"; "joined a large platform company" | R-a |
+| 3 | No "why not Coder"; Q1 dodged Agent HQ | FIXED | Q1 L158: "If you are GitHub-only and accept a GitHub-hosted control plane, use it". Q2 L159 is the Coder question and names the AI Premium overlap honestly. Old Q2 and Q4 are merged into Q3 L160, which adds DCO without a CLA. | — |
+| 4 | Agent HQ facts stale | FIXED | §4 L58 "published 2025-10-28" plus the docs fact; §C L111 "timing: shipping, public preview"; Open questions L202 rewritten | — (docs quotes re-verified, row V1) |
+| 5 | §D option 3 mislabelled BLOCKING | FIXED | §D L126: every con `[ADVISORY]`, "Survives"; verdict L130: "2 and 5 are eliminated by BLOCKING items …; 1, 3 and 4 survive" | — |
+| 6 | §B invariant applied inconsistently | FIXED | L91 "Invariant applied uniformly"; L96 FSL/BSL `[BLOCKING]`; L97 ELv2 `[BLOCKING]`, SSPL `[ADVISORY]`; L98 Sustainable Use `[BLOCKING]`; verdict L100 | R-b ("open" is undefined) |
+| 7 | "Empty server slot" contradicts R1 | FIXED | §C L114 names Orca, Paseo Hub, Emdash and Paradev and says they "partially occupy the self-hosted slot"; L118 quotes R1's narrower gap; §A L81 "not yet a proven payer"; §D L124 cons name the partial occupants | R-c (leftover "desktop tools") |
+| 8 | No pre-build experiment falsifies the payer thesis | FIXED | §G L178 "Payer discovery calls (the kill test)": pass = ≥ 3 letters *and* ≥ 2 budget lines; fail ⇒ re-scope or stop. Recommendations L198. | — |
+
+### 2. `ritornello`: checks run by the reviewer
+
+**Summary:** the registries are free and USPTO shows no conflict, but a same-category product already uses the name (finding N1).
+
+| Check | Result | Source |
+|---|---|---|
+| npm, PyPI, crates.io | All 404 (free). npm text search returns 0. Matches v3. | https://registry.npmjs.org/ritornello, https://pypi.org/pypi/ritornello/json, https://crates.io/api/v1/crates/ritornello, https://registry.npmjs.org/-/v1/search?text=ritornello |
+| GitHub `ritornello` | Taken: a User account created 2017-08-01, 0 public repos. Not an organisation (`/orgs/ritornello` returns 404). | https://api.github.com/users/ritornello |
+| GitHub `ritornello-dev` | **Taken**: an Organization created 2026-04-30, 0 public repos. v3 L70 says "not checked". | https://api.github.com/users/ritornello-dev |
+| GitHub `ritornellohq`, `ritornello-hq`, `getritornello`, `ritornello-ai` | All 404 (free). | `https://api.github.com/users/<handle>` |
+| GitHub repository-name search | 29 repositories, which matches v3's count. v3's "none in category" is **wrong**: one is a same-category product (next row). The rest are unrelated: a ChIP-seq peak caller (2016), a Rust internet-radio player, a Python map-generation library, a music-practice web app, a web store, a LilyPond snippet, and the `ritornello-labs` organisation (Anki/spaced-repetition tools). | https://api.github.com/search/repositories?q=ritornello+in:name |
+| **Same-category product** | **"Ritornello", a macOS app; v0.1.0 released 2026-07-17 (DMG plus Sparkle appcast).** The Portuguese README says: "Canvas infinito de loop engineering — orquestre agentes de IA em terminais sobre um canvas: desenhe ciclos com avaliadores, condições de saída … e budgets … e mantenha o veredito final sempre humano". It ships a `rito` CLI through which "agentes conversam entre nós", and has "Pódio: custo por ciclo e veredito ship/block humano". In English: orchestrate AI agents in terminals on a canvas, with evaluators, exit conditions, budgets and a human ship/block verdict. That is agent orchestration with gates and budgets, this project's category. The repository description ("Releases oficiais do Ritornello — downloads e feed de atualizações") does not reveal this; only the README does. That is probably how the search missed it. | https://github.com/allansteve/ritornello-releases, https://github.com/allansteve/ritornello-releases/releases/tag/v0.1.0 |
+| ritornello.dev | Registered 2026-07-23, which matches v3. The site reads "Ritornello … what returns, remains … Spaced-repetition decks and power-user tools: built around Anki", and the `ritornello-labs/www` repository is "ritornello.dev — organization homepage". Not same category, but it is an active software brand on the `.dev` domain. | https://rdap.org/domain/ritornello.dev, https://ritornello.dev, https://github.com/ritornello-labs/www |
+| ritornello.io | `whois`: "Domain not found." Matches v3. | `whois ritornello.io` |
+| ritornello.app, ritornello.ai | `.app` registered 2023-03-27. `.ai` returned RDAP 404 "Object not found"; not confirmed with `whois`. | https://rdap.org/domain/ritornello.app, https://rdap.org/domain/ritornello.ai |
+| USPTO | Exact word mark RITORNELLO: **0 records**. Wildcard `*ritornell*` across word mark, pseudo-text, description and goods/services: 1 record, RITORNELLI, Reg. 3578625 (SN 77312220), IC 030, live, owned by a pasta maker; no software conflict. Control: BATON on the same endpoint returned 339 records, the same as in the first review, so the search works. US only. | `https://tmsearch.uspto.gov` (POST backend `/prod-stage-v1-0-0/tmsearch`); TSDR https://tsdr.uspto.gov/statusview/sn77312220 (not fetched) |
+| EUIPO, UKIPO | `UNVERIFIED` (not checked). The word is Italian, so EU marks are plausible. | — |
+| Web product-name check | `UNVERIFIED`: `web_search -s public` errored again this session. The README check above is the only product-name evidence. | — |
+
+**Re-check of `kapell` (v3 L69).** The repository count of 89 matches. However, v3 names only one same-category `kapelle` (2026-08-19). The `kapelle` name search turns up two more agent-related repositories:
+- https://github.com/0xkilgore/kapelle (2026-10-14): "Agent work under owner approval, with verifiable results".
+- Its companion `kapelle-architecture`: "local-first agent operations".
+
+Source: https://api.github.com/search/repositories?q=kapelle+in:name. See R-e.
+
+### 3. New issues introduced by v3
+
+**N1. [BLOCKING] §5 L70, §E L138, Recommendations L193: `ritornello` collides with a same-category product, yet v3 states "no same-category repository".**
+- This is the same collision type as finding 1, introduced by the fix for finding 1.
+- It feeds the HIGH naming recommendation ("take `cuelist`, `ritornello` or `kapell` to trademark search").
+- The `-dev` handle is also taken, and the `.dev` domain hosts an active software brand.
+
+Fix:
+- Reject `ritornello` in §5 and §E with the same wording used for `ripieno`.
+- Add one clause to the §5 method: "read the README of every repository-name hit whose description is empty, non-English or a release/landing repository".
+- Recommendations: "take `cuelist` or `kapell`, or new candidates that pass the full §5 method, to trademark search".
+- §E and Open questions L207: "the final two" become those two.
+
+The following are ADVISORY and do not affect the verdict.
+
+- **R-a. §F L148 and §A L82: two claims go beyond the sources.**
+  - "Self-hosted alternatives exist, but their gates, audit and policy sit in paid tiers or do not exist." R1 table 3e marks Orca, Paseo Hub and Emdash pricing `UNVERIFIED`, so "paid tiers" is verified only for Coder and Paradev.
+  - "As of this release remains proprietary with no self-hosted option" (L148) and "a permanent argument" (L82) both predict against Conductor's own roadmap: "Not yet, but we are building a self-hosted cloud offering … as part of an Enterprise plan" (verified today on https://www.conductor.build/docs/cloud/faq).
+  - Fix: mark both as assumptions in a hypothetical 2027 release, and drop "permanent".
+- **R-b. "Open" is used as an invariant without a definition.** §D L128 makes "violates 'open'" a BLOCKING con. §B, by contrast, labels "not OSI open source" ADVISORY (L96) and lets SSPL survive (L100), although Redis itself calls SSPL "not truly open source". VISION L19 says only "open". Define the term once (for example, "the core is under an OSI-approved licence") and apply it in both places. If the definition is OSI, SSPL becomes BLOCKING. The Apache-2.0 recommendation does not change.
+- **R-c. §D: leftover wording from before the finding 7 fix.**
+  - The verdict (L130) still says "what the desktop tools and Coder Community do not ship", but §C L114 now says these tools are "not only desktop apps". Say "the open-source conductors".
+  - L124 says "Paseo Hub, Emdash and Paradev already sell" team features. Paseo Hub and Emdash pricing is `UNVERIFIED` in R1, so write "offer".
+  - §C L114 lists Emdash as open source. R1 says only "Emdash Classic" is OSS, and it is in maintenance. Label it.
+- **R-d. §B L95 (option 3): "incompatible with CNCF hosting, whose charter requires Apache-2.0 inbound and outbound".** Charter §11(c) lets the Governing Board approve an alternative licence "on an exception basis". The stronger constraint is §11(a)(ii): every project must "use only OSI-approved open source software licenses", which also excludes FSL, BSL, ELv2 and SSPL. Fix: write "requires Apache-2.0 unless the Governing Board grants an exception" (https://github.com/cncf/foundation/blob/main/charter.md).
+- **R-e. §5 L69 and §E L139: `kapell` is weaker than stated.**
+  - With `ritornello` out, `kapell` becomes rank 2, and it has three same-category near-homographs, not one. State that.
+  - The `kapelle` fact has no URL (rule 1). Add one.
+  - §E L137/L139 say "handles … free" for `cuelist` and `kapell`, but the bare GitHub user names are taken. Only the `-dev`/`hq` variants are free, as §5 says. Write "`-dev`/`hq` handles".
+- **R-f. Length.** By the reviewer's count, v3 is about 5,125 prose words, excluding URLs, Sources and the Review log; about 5,388 including Sources. That is close to the 5,000 budget but still over. Dropping the `ritornello` bullet and rank (N1) and the §C "Cloud providers" bullet (L115) would close most of the gap.
+- **R-g. Rule 3: confidence labels without the required one-clause reason.** §C L110 "(HIGH)", L115 "(MED)", L116 "(HIGH)"; §A L85 "(LOW.)"; and L82 "(MED on pull; HIGH on competitive pressure.)".
+- **R-h. Status line L3 self-certifies "all 8 BLOCKING findings fixed".** Write "revised; pending re-verification", or update it after this review.
+- **R-i. Rule 5 note for the N1 fix.** Cite the Ritornello app through its repository URL in Sources, as v3 already does for `ripieno`. Do not restate the account handle in prose, following v3's own practice of citing `x.com/i/status/…`.
+
+### Spot-check of sources new or newly inlined in v3
+
+S = supported; P = partly supported or overstated; F = failed.
+
+| # | v3 L | URL | Result | Note |
+|---|---|---|---|---|
+| V1 | 58 | https://docs.github.com/en/copilot/concepts/agents/about-third-party-agents | S | "Third-party coding agents are currently in public preview"; Claude "can be powered by your existing Copilot subscription"; "your organization policies, or the "Agents" section of an enterprise's AI controls". |
+| V2 | 36, 95 | https://github.com/cncf/foundation/blob/main/charter.md | P | §11(b)(ii)/(iii) quoted accurately; §11(c) exception clause omitted (R-d). |
+| V3 | 25 | https://www.algolia.com/pricing | S | "10,000 requests/mo included then $0.60 per additional 1K requests". |
+| V4 | 40 | https://cursor.com/pricing | S | "Teams $30+/user/month"; Enterprise "Custom". |
+| V5 | 59 | https://openai.com/index/introducing-codex/ | S | "a cloud-based software engineering agent that can work on many tasks in parallel". |
+| V6 | 17 | https://backstage.io/ | S | Publisher Spotify; "open source developer portal framework". |
+| V7 | 18 | https://raw.githubusercontent.com/coder/coder/main/LICENSE | S | GNU Affero General Public License. |
+| V8 | 85 | https://www.conductor.build/changelog/0.78.0-introducing-conductor-cloud | S | "mobile apps 👀, UI clients, and internal tools, like Slackbots". |
+| V9 | 50 | https://www.conductor.build/docs/cloud/faq | S | GitLab/Bitbucket "Not yet"; cloud chat messages "stored on Conductor's servers"; self-hosted "Not yet, but we are building a self-hosted cloud offering". |
+| V10 | 50 | https://www.conductor.build/docs/faq | S | "Agents run directly on your system without sandboxing." |
+| V11 | 69 | https://api.github.com/search/repositories?q=kapell+in:name | S / P | Count of 89 matches; only one of three agent-related `kapelle` repositories is named (R-e). |
+| V12 | 70 | https://api.github.com/search/repositories?q=ritornello+in:name | F | Count of 29 matches; "none in category" is false (N1). |
+
+Totals: 9 S, 1 P, 1 S/P, 1 F. No fabricated URL.
+
+### 4. Verdict (re-verification)
+
+**REVISE.** The verdict is derived from BLOCKING items only:
+- All 8 original BLOCKING findings are FIXED.
+- 1 new BLOCKING finding (N1, `ritornello`) was introduced by the revision.
+
+The N1 fix is confined to §5 L70, §E L136–L140, Recommendations L193 and one clause in the §5 method. Once those lines are fixed, the reviewer expects APPROVE. The lead can verify the fix on disk without another full review cycle.
