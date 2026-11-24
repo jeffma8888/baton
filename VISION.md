@@ -1,31 +1,34 @@
 # baton — vision (v0, pre-research draft)
 
 > Working codename. Final name is a Phase-0 research deliverable (trademark + handle availability).
-> Status: HYPOTHESIS. Everything below is to be tested by `docs/research/R1..R3`.
+> Status: HYPOTHESIS v0.1 (thesis corrected 2026-11-23 after R1). Tested by `docs/research/R1..R3`.
 
 ## The one-paragraph thesis
 
 Teams increasingly write software by running **many coding agents in parallel** (Claude Code,
 Codex, Cursor, OpenCode, Gemini CLI, ...) against isolated copies of a repo, then reviewing and
 merging their work. The product category that made this usable, the **conductor**, was defined
-by Conductor (YC S24; 100K+ builders) — and on 2026-11-04 Conductor announced it joined Meta,
-shut its cloud on 2026-11-20, and winds down its local app in early 2027. Meanwhile every agent
-vendor is building its *own* vendor-locked conductor, and companies that want one for their own
-agents, repos, policies and customers have to build from scratch.
+by Conductor (YC S24; vendor-claimed 100K+ builders). On 2026-11-04 Conductor announced it was
+joining Meta and shutting its cloud; on 2026-11-12/13 it reversed course and now continues as a
+proprietary, Meta-owned product with no self-hosted option and visibly damaged user trust
+(`docs/research/R1-market-landscape.md` §1-2). Users scattered to a dozen free OSS desktop tools;
+every agent vendor ships its own orchestration surface, mostly single-vendor (GitHub Agent HQ is
+the cross-vendor exception); and companies that need a conductor they can **run themselves,
+with their own agents, repos, sandboxes, policy gates and audit** still build one from parts.
 
-**baton is an open, self-hostable conductor platform that any company can onboard in an hour
+**baton is an open, self-hostable conductor platform that a company can onboard in an hour
 and customize as their own**: bring your agents, your repos, your sandboxes, your review gates
-and your branding; expose it to your teams or to your customers.
+and your branding; expose it to your teams, and, if the demand proves real, to your customers.
 
-## Who it is for (hypotheses to validate)
+## Who it is for (hypotheses; R1 confidence in brackets)
 
-1. **Startups building agent products** who need an orchestration surface for their customers
-   but do not want to build and operate one (B2B2B: they are the customer, their users are the
-   end users).
-2. **Engineering teams** (10–500 engineers) who used Conductor or built ad-hoc worktree scripts
-   and want a team-shared, auditable, policy-gated way to run agent fleets.
-3. **Platform/DevEx teams** at larger companies who need self-hosting, SSO, audit, and
-   per-repo policy for agent work.
+1. **Platform / DevEx teams** at companies that need self-hosting, SSO, audit, budgets and
+   per-repo policy for agent work, across more than one agent vendor. [R1: real, MED]
+2. **Engineering teams** (10-500 engineers) who outgrew ad-hoc worktree scripts or a single
+   vendor's desktop and want team-shared, policy-gated agent fleets. [R1: real but contested
+   by strong free OSS desktop tools, MED]
+3. **Startups building agent products** who would embed a conductor for THEIR customers
+   (B2B2B). [R1: no primary evidence yet, LOW; kept as a later option, not the wedge]
 
 ## What it is NOT (initial non-goals)
 

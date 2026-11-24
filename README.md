@@ -15,10 +15,12 @@ Every design decision is visible here before it becomes code.
 
 ## Why now
 
-Conductor, the product that defined the category (100K+ builders), joined Meta on 2026-11-04,
-shut down Conductor Cloud on 2026-11-20 and winds down its local app in early 2027. The
-remaining options are vendor-locked to a single agent. There is no open, agent-agnostic,
-self-hostable conductor that a company can adopt and customize.
+Conductor, the product that defined the category, announced on 2026-11-04 that it was joining
+Meta and shutting down; on 2026-11-12/13 it reversed and continues as a proprietary Meta-owned
+product with no self-hosted option. Its users scattered to free single-user desktop tools; agent
+vendors each ship their own, mostly single-vendor, surface. What does not exist is an **open,
+agent-agnostic, self-hostable conductor with policy, audit and team features** that a company
+can adopt and make its own. See `docs/research/R1-market-landscape.md`.
 
 ## License
 

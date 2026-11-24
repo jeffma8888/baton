@@ -37,18 +37,21 @@ Read `VISION.md` before anything else. It is a hypothesis; your job may be to br
    for a future iteration, do NOT hand any part of this to a later iteration, and do NOT
    re-delegate to any other agent.**
 
-## What we already know (verified 2026-11-23, secondary source: unite.ai; re-verify against
-primary — conductor.build, its docs, YC profile, founder posts)
+## What we already know (verified 2026-11-23 against primary sources; see R1 §1)
 
-- Conductor (YC S24, SF; founders Charlie Holtz, Jackson de Campos) launched Jul 2025 as a Mac
-  app that gives each coding agent an isolated copy of the codebase, shows all agents'
-  activity, and lets the user review, open PRs and merge.
-- Later supported Claude Code, Codex, Cursor, OpenCode; desktop + mobile + API; shared team
-  workspaces (see who is active, follow, co-prompt); Cloud workspaces = isolated microVM
-  sandboxes (Vercel sandboxes) that keep running after the app closes. Claimed 100K+ builders.
-- 2026-11-04: announced joining Meta. Cloud read-only 2026-11-13, shut 2026-11-20, data
-  deleted after; local Mac app supported until early 2027 then winds down; founder promised a
-  "next interface" early 2027 with no details.
+- Conductor (conductor.build, YC S24) launched Jul 2025: each coding agent gets an isolated
+  copy of the codebase (git worktrees locally; microVM sandboxes on Vercel Sandbox in Cloud),
+  all agents' activity visible, review / PR / merge from one UI. Supports Claude Code, Codex,
+  Cursor, OpenCode; desktop + mobile + API v0; team workspaces. Pricing was $0 / $50 / $60 per
+  user + Enterprise. 100K+ builders is a vendor claim.
+- 2026-11-04: announced joining Meta, Cloud to shut 11-20. **2026-11-12/13: REVERSED.** Changelog
+  0.94.2: "Conductor isn't shutting down." Releases 0.95-0.99+ followed. It is now a proprietary
+  Meta-owned product; self-hosting is "being built" for Enterprise only. Users report trust damage
+  and many moved to OSS tools (T3 Code, Paseo, Orca, Herdr, Paradev). Do NOT write "Conductor
+  shut down" anywhere; do not pitch to "stranded Conductor users".
+- GitHub Agent HQ is a cross-vendor orchestration surface; Claude Code and Cursor offer
+  customer-side execution. The gap is open + self-hosted + policy/audit + cross-vendor, not
+  "nothing exists".
 
 ## Working thesis to test
 
