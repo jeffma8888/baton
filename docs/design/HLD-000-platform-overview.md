@@ -1,6 +1,6 @@
 # HLD-000 Platform overview HLD
 
-> Status: DRAFT v2 (revised after review, awaiting re-verification)
+> Status: DRAFT v3 (two findings fixed after re-verification, awaiting final check)
 > HLD = architecture decisions, system boundaries, options analysis, data flows.
 > No class names, config keys, or test file names (those belong in the LLD).
 > Every decision cites its source (research doc §, measurement, or "verified-by: <how>").
@@ -35,7 +35,7 @@ The approved stance is option B (team server, self-hosted runners, worktree and 
 
 ## P0 Scope
 
-The first release is the PRD's 12-week self-hosted alpha for one organisation (PRD §P0 scope). R2 judges this slice credible for a small team: two agents, two executors, at most two Git hosts, one runner OS and architecture, Postgres, no tenancy or compliance claim (R2 §Scope, LOW).
+The first release is the PRD's 12-week self-hosted alpha for one organisation (PRD §P0 scope). R2 judges this slice credible for a small team (R2 §Scope, LOW).
 
 P0 includes:
 
@@ -50,7 +50,7 @@ P0 includes:
 - Opt-in heartbeat, off by default (PRD FR-32).
 - Backup, restore and a documented schema-compatible upgrade (PRD NFR-8).
 
-Why limited to this: the open core must run task -> run -> diff -> gate -> PR without a paid module (VISION §Design principles; R3 §B); more providers, tenancy, HA or per-agent parity need buyer evidence and a threat review first (R2 §Scope). The value is gates, policy and audit, not a UI (VISION §What it is NOT).
+Why limited to this: the open core must run task -> run -> diff -> gate -> PR without a paid module (VISION §Design principles; R3 §B); more providers, tenancy, HA or per-agent parity need buyer evidence and a threat review first (R2 §Scope).
 
 **Pre-HLD experiment record (PRD §Handoffs item 9).** As of 2026-11-26 none of the seven R3 §G experiments has a result (VISION §How we will know); dependent assumptions are marked UNRUN. VISION requires all seven before any HLD is approved, so review proceeds but approval waits (Action Item 1). Row 8 is the additional pilot threat review the PRD names (PRD Assumption 5, §Handoffs item 3), not an R3 §G item.
 
@@ -121,6 +121,7 @@ P1 requirements FR-7, FR-8 and FR-30 get a seam, not a build (Out of Scope 6, 7,
 16. Tamper-evident audit chains, signing and export: policy-and-gates and Enterprise HLDs (R2 §Analysis/Execution; PRD §Handoffs item 6).
 17. Import of other conductors' settings: later onboarding requirements (R1 §5).
 18. More than one runner OS and architecture: later execution HLD (PRD §P0 scope).
+19. No-Postgres single-user local mode: a later local-mode HLD (§5 Option 7).
 
 ## Assumptions
 
@@ -383,7 +384,7 @@ Every run gets its own checkout and branch (FR-9). Tier is a policy attribute sh
 
 #### 3.2 Default tier for lower-trust work
 
-The trade: self-operated Firecracker needs KVM, a jailer, guest images and operator-managed volumes, network and secrets (R2 S04); hosted providers bill per second and differ on persistence, egress and secrets (R2 §1 provider table, S05 to S19, S79, S80); a hardened container (rootless, dropped capabilities, seccomp, no daemon socket, quotas, egress policy) shares the runner's kernel (R2 S03).
+The trade: hosted providers bill per second and differ on persistence, egress and secrets (R2 §1 provider table, S05 to S19, S79, S80); a hardened container (rootless, dropped capabilities, seccomp, no daemon socket, quotas, egress policy) shares the runner's kernel (R2 S03).
 
 **Option 1: Hardened container by default, with a bounded eligibility envelope (Preferred, conditional on the pilot threat review)**
 
@@ -627,17 +628,17 @@ Retention (PRD NFR-10 assigns it here): the product never deletes basic audit ev
 **Option 7: Embedded single-writer database, no Postgres**
 
 **Pros:** 1. Infrastructure-free binary (R2 §Analysis/Durability).
-**Cons:** 1. [ADVISORY] One active writer suits a single-user local mode, not concurrent team claims, locks and backups (R2 §Analysis/Durability, MED).
-**Why not preferred:** no BLOCKING con; not preferred on advisory grounds.
+**Cons:** 1. [BLOCKING] No Postgres in the Compose deployment, failing FR-31 (I7): "Install the server, Postgres and runner via a single documented Compose deployment." 2. [ADVISORY] One active writer suits a single-user local mode, not concurrent team claims, locks and backups (R2 §Analysis/Durability, MED).
+**Why not:** infeasible because of con 1 alone; con 2 is advisory and overruling it does not change this verdict.
 
 **Comparison table**
 
 | Criterion | 1 Postgres | 2 Library | 3 Temporal | 4 BSL/SSPL | 5 Trigger.dev | 6 Broker | 7 Embedded |
 |---|---|---|---|---|---|---|---|
-| Single Compose, no cluster (I7) | Yes | Yes | Yes, more services | Yes | Yes, more services | Yes | Yes |
+| Single Compose, no cluster (I7) | Yes | Yes | Yes, more services | Yes | Yes, more services | Yes | No Postgres |
 | Licence boundary (I2) | Yes | Yes | Yes | No | Unverified | Yes | Yes |
 | Atomic state + audit | Yes | Yes | Partial | Partial | Partial | Outbox | Yes |
-| BLOCKING | None | None | None | I2 | None | None | None |
+| BLOCKING | None | None | None | I2 | None | None | I7 (FR-31) |
 
 ### 6. Gates, policy, audit and budgets
 
@@ -669,7 +670,7 @@ Retention (PRD NFR-10 assigns it here): the product never deletes basic audit ev
 
 **Option 4: Repo-resident policy read from the protected default branch.** **Pros:** 1. Policy reviewed like code. **Cons:** 1. [ADVISORY] Policy authority moves to host merge rights, not baton's admin role (FR-26). 2. [ADVISORY] Per-host semantics. **Why not preferred:** no BLOCKING con; not preferred on advisory grounds.
 
-**Option 5: Policy read from the run's own candidate branch.** **Pros:** 1. Policy travels with the change. **Cons:** 1. [BLOCKING] The agent can edit the policy gating its own change, so execution self-approves, violating I4 (PRD FR-17: "execution identities cannot self-approve"; R2 §Analysis/Execution). 2. [ADVISORY] Per-host semantics. **Why not:** infeasible because of con 1 alone; con 2 is advisory and overruling it does not change this verdict.
+**Option 5: Policy read from the run's own candidate branch.** **Pros:** 1. Policy travels with the change. **Cons:** 1. [BLOCKING] The run reads policy from the branch its agent writes, so an agent commit becomes the policy for that run's tools, network, checks and approvals with no human merge first (unlike Option 4): an execution identity, which has no role (§8), changes policy, failing PRD FR-26 ("an unauthorised user cannot change policy or approve; an admin can change policy"; FR-21). 2. [ADVISORY] Per-host semantics. **Why not:** infeasible because of con 1 alone; con 2 is advisory and overruling it does not change this verdict.
 
 #### 6.3 Audit write path
 
@@ -696,7 +697,7 @@ Retention (PRD NFR-10 assigns it here): the product never deletes basic audit ev
 | Sub-decision | Preferred | Eliminated by BLOCKING | Viable, not preferred |
 |---|---|---|---|
 | 6.1 | Two-phase | 2 (I6), 3 (I6), 4 (I5) | none |
-| 6.2 | Declarative | 5 (I4) | 2, 3, 4 |
+| 6.2 | Declarative | 5 (FR-26) | 2, 3, 4 |
 | 6.3 | Same transaction | 2 (I9), 3 (FR-23) | none |
 | 6.4 | Split | 2, 3 (I10) | none |
 
@@ -841,9 +842,9 @@ Vendor CLIs send prompts and tool output to their model providers; baton does no
 
 **Observability.** Metrics for queue depth, lease expiries, reconciliations, gate outcomes and per-stage durations (checkout, container ready, ready-to-prompt) feed the NFR-2 report, not provider boot claims (R2 §1). The heartbeat is separate and opt-in (FR-32; Assumption 14).
 
-**Cost model.** Server and Postgres are small fixed costs; runner compute and inference on the customer's keys dominate (inference); the self-hosted product is never usage-metered (R3 §B). Later hosted providers add per-second compute and idle charges, so budgets count more than tokens (R2 §1 provider table).
+**Cost model.** Server and Postgres are small fixed costs; runner compute and inference on the customer's keys dominate (inference); the self-hosted product is never usage-metered (R3 §B). Later hosted-provider charges: §3.2 Option 3.
 
-**Migration and rollout.** Internal use, then one pilot repo, then design partners, each behind the §G record (Action Item 1). No import tooling in P0 (Out of Scope 17). A later hosted edition reuses these boundaries with the vendor as operator (R2 §Options D mitigation).
+**Migration and rollout.** Internal use, then one pilot repo, then design partners, each behind the §G record (Action Item 1). A later hosted edition reuses these boundaries with the vendor as operator (R2 §Options D mitigation).
 
 ## Appendix
 
@@ -854,20 +855,19 @@ Vendor CLIs send prompts and tool output to their model providers; baton does no
 | I1 | §2 Options 6, 7 |
 | I2 | §2 Option 5; §5 Option 4; §9.2 Option 2 |
 | I3 | §3.1 Options 2, 3 |
-| I4 | §6.2 Option 5 |
 | I5 | §6.1 Option 4 |
 | I6 | §6.1 Options 2, 3 |
-| I7 | §10.1 Option 2 |
+| I7 | §5 Option 7; §10.1 Option 2 |
 | I8 | §9.1 Options 2, 3, 4 |
 | I9 | §6.3 Option 2 |
 | I10 | §6.4 Options 2, 3 |
-| PRD FR | §3.1 Option 4 (FR-10); §4 Option 3 (FR-13, FR-5); §6.3 Option 3 (FR-23); §7.1 Option 4 (FR-18) |
+| PRD FR | §3.1 Option 4 (FR-10); §4 Option 3 (FR-13, FR-5); §6.2 Option 5 (FR-26); §6.3 Option 3 (FR-23); §7.1 Option 4 (FR-18) |
 
-I11 and I12 eliminate no option; I11 would fail only a mandatory paid-only provider, and I12 shapes §3.2 and §10.1.
+I4, I11 and I12 eliminate no option; I4 shapes §3.3 and §8, I11 would fail only a mandatory paid-only provider, and I12 shapes §3.2 and §10.1.
 
 ## References
 
-Primary-source URLs live in the research source lists and are cited here by S-id, which meets BRIEF rule 1; this HLD adds no new source.
+Primary-source URLs are in the research source lists, cited here by S-id (BRIEF rule 1); this HLD adds none.
 
 1. VISION.md, APPROVED v2.
 2. docs/design/PRD-000-platform.md, APPROVED v2.
@@ -917,3 +917,5 @@ R2 section keys: §1 to §5 are its numbered Facts sections; §Analysis/Executio
 | 2026-11-26 | GPT (cross-model) | REVISE: finding 18 [ADVISORY] | §5 names record categories instead of entities; §6.3 names evidence categories and leaves the field inventory to the LLD. State names stay as high-level states because findings 10 and 11 depend on them. |
 | 2026-11-26 | GPT (cross-model) | REVISE: finding 19 [ADVISORY] | Whole document. Body cap raised to 72,000 B for v2 as recommended and instructed. To fit the added options, Glossary rows defined in the body, the §4 Resume column and some prose were trimmed; body measured on disk after the last edit. |
 | 2026-11-26 | GPT (cross-model) | REVISE: finding 20 [BLOCKING] | I8 and §9.1. I8 now states no untrusted plugin code runs in the server process. Option 3, sandboxed in-server Wasm, carries a BLOCKING I8 con quoting PRD FR-29 ("without running untrusted plugins in the server") and is eliminated on I8 alone; an out-of-process Wasm host falls under Option 1. Table and Appendix A list Options 2, 3, 4 under I8. |
+| 2026-11-26 | GPT (cross-model), re-verification of v2 | REVISE: finding 21 [BLOCKING] | §5 Option 7. Con 1 is now BLOCKING: no Postgres in the Compose deployment, failing PRD FR-31 ("Install the server, Postgres and runner via a single documented Compose deployment"), tagged I7 as in §10.1 Option 2. The verdict is infeasible because of con 1 alone; the one-writer con stays ADVISORY and does not change it. §5 table: I7 row reads No Postgres, BLOCKING row reads I7 (FR-31). Appendix A I7 row adds §5 Option 7. R2 §Analysis/Durability calls a single-user local mode possible, so Out of Scope 19 keeps it for a later local-mode HLD, not as a P0 option. BLOCKING count 22 to 23. |
+| 2026-11-26 | GPT (cross-model), re-verification of v2 | REVISE: finding 22 [BLOCKING] | §6.2 Option 5. Chose (a), retag. (b), policy from the protected default branch at the base SHA with branch edits effective only after merge, is Option 4 already, so it would duplicate a viable option. Con 1 now explains how the edit becomes authoritative: the run reads policy from the branch its agent writes, so an agent commit sets that run's tools, network, checks and approvals with no human merge first (unlike Option 4); an execution identity, which has no role (§8), thus changes policy, failing PRD FR-26 ("an unauthorised user cannot change policy or approve; an admin can change policy"; FR-21). The R2 cite, which says nothing on this, is dropped. §6 table reads 5 (FR-26); Appendix A moves it from the I4 row to PRD FR, and its note says I4 eliminates no option. To keep the body under 72,000 B, duplicate prose was trimmed: the §3.2 Firecracker clause (kept in Option 2 con 1), the P0 Scope slice list (the bullets below), the not-a-UI sentence (Out of Scope 11), the §11 hosted-cost sentence (now a pointer to §3.2 Option 3, con 3) and the import-tooling sentence (Out of Scope 17); the References note is shortened. |
