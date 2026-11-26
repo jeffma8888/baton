@@ -1,6 +1,6 @@
 # R2 — Technical landscape for an open coding-agent conductor
 
-**Status:** DRAFT v2 — revised against findings F1–F12 in `R2-technical-landscape.review.md`. **Observed:** 2026-11-25. Provider claims are not cross-provider benchmarks. `[Snn]` references primary URLs; architecture estimates are inferences. This builds on R1/R3.
+**Status:** APPROVED v2 (re-verified 2026-11-25 by a different-model reviewer: F1–F3 BLOCKING closed, F4–F12 ADVISORY closed, F13–F15 ADVISORY open; see `R2-technical-landscape.review.md`). Revised against findings F1–F12. **Observed:** 2026-11-25. Provider claims are not cross-provider benchmarks. `[Snn]` references primary URLs; architecture estimates are inferences. This builds on R1/R3.
 
 ## Facts
 
