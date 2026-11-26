@@ -7,7 +7,7 @@
 
 | # | Deliverable | File | Author model | Reviewer model | Depends on | Done when |
 |---|---|---|---|---|---|---|
-| 1 | VISION v1 | `VISION.md` (replaces v0.1 in place; git keeps v0) | Fable | Opus | R1, R3, R2 verdict | Reviewer APPROVE; every factual claim cites R1/R2/R3 by section |
+| 1 | VISION v1 | `VISION.md` (replaces v0.1 in place; git keeps v0) | Fable | Opus | R1, R3, R2 verdict | DONE: APPROVED v2 2026-11-26 (A12-A15 advisory open) |
 | 2 | PRD-000 product requirements | `docs/design/PRD-000-platform.md` | GPT | Fable | VISION v1 | Reviewer APPROVE; every requirement traces to VISION v1 or a research doc; P0 / later split explicit |
 | 3 | HLD-000 platform overview | `docs/design/HLD-000-platform-overview.md` | Opus | GPT | PRD-000, R2 APPROVED | Reviewer APPROVE; follows `TEMPLATE-HLD.md`; all options listed, cons tagged, verdicts from BLOCKING alone |
 
@@ -29,6 +29,12 @@ the lead flips the status line. Nothing in `docs/plans/` is written before HLD-0
 - Kill test for the payer hypothesis and its PASS criteria, plus R3 §G's other experiments and the day-90 rule (R3).
 - Naming: `baton` is a codename and is not usable as a product name; leading candidate and
   what is still unchecked (R3 naming section).
+
+## Scheduled alongside Phase 1
+
+R3 §G's pre-HLD experiments (payer kill test first) are the maintainer's to run; they are
+not authored by teammates. HLD-000 records which have been run and their results at the time
+of writing, and marks assumptions that depend on an unrun experiment.
 
 ## Open after Phase 1
 

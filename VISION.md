@@ -1,7 +1,7 @@
 # baton (codename) - vision
 
 > Working codename; `baton` is not usable as a product name (R3 §E).
-> Status: DRAFT v2 (revised after review, awaiting re-verification). Supersedes HYPOTHESIS v0.1 (in git history). Inputs: R1 APPROVED v2, R2 APPROVED v2, R3 APPROVED v4.
+> Status: APPROVED v2 (re-verified 2026-11-26 by a different-model reviewer: B1-B3 BLOCKING closed, A1-A11 closed, A12 partial, A13-A15 ADVISORY open; see docs/design/VISION.review.md). Supersedes HYPOTHESIS v0.1 (in git history). Inputs: R1 APPROVED v2, R2 APPROVED v2, R3 APPROVED v4.
 
 ## The one-paragraph thesis
 

@@ -1,6 +1,6 @@
 # VISION.md DRAFT v1: cross-model review
 
-status: COMPLETE (review of VISION.md DRAFT v1, 10,998 B)
+status: COMPLETE (v1 review: REVISE; v2 re-verification: APPROVE, see '## Re-verification (v2)')
 
 Reviewer: Opus. Target: `VISION.md` DRAFT v1, 10,998 B, written by a different model. Sources checked: R1 APPROVED v2, R2 APPROVED v2, R3 APPROVED v4 (per its Review log row R3 L290). VISION lines are `L<n>`; research lines are `R1 L<n>`, `R2 L<n>`, `R3 L<n>`. `VISION.md` was not edited and git was not run.
 
@@ -240,3 +240,133 @@ Author's mistakes found (for the corpus, generic form):
 - Cited a confidence label to the evidence section instead of the verdict section, and let a second doc's label sit under a "first doc's confidence" convention (B2).
 - Rewrote an invariant that a downstream approved doc names as the premise of its BLOCKING verdicts, without restating it (B3).
 - Left "pending" labels after the upstream doc was approved; stale-status labels need a sweep before submission (A1).
+
+## Re-verification (v2)
+
+status: COMPLETE
+
+Target: `VISION.md` DRAFT v2, 12,474 B total. Lines below are v2 lines (`L<n>`). `VISION.md` was not edited and git was not run.
+
+### Per-finding status
+
+| Finding | Tag | Status | Evidence |
+|---|---|---|---|
+| B1 | BLOCKING | closed | L20 now reads "Conductor Teams and Paradev Team $60 per user; Devin Teams $80 a month flat for up to 100 users (R1 §5; R3 §3)". R1 §5 L205 gives Conductor Teams $60/user, Paradev Team $60/user and Devin Teams $80/mo; R3 §3 L41 classes Devin as "Per team flat fee ... for up to 100 users". Units now match both sources; "per seat" is gone. Tense nuance: A14. |
+| B2 | BLOCKING | closed | The v1 "R1 confidence in brackets" convention line is gone; each label is attributed in place. L25 "[R1 Recommendations: real, MED]" = R1 L256; L26 "[R1 Recommendations: real but contested, MED]" = R1 L257; L27 "[R1 Recommendations: not evidenced, LOW]" = R1 L258 (was missing); 3a "[R3 §A: MED, absence of evidence]" = R3 L84; 3b "[R3 §A: LOW]" = R3 L85. |
+| B3 | BLOCKING | closed | L40 adds "Invariants (R3 §B, §D). Any company may offer baton to its own teams or to its customers; the core is under an OSI-approved licence; self-host first, hosted later." That matches R3 §B L91 (customer and open invariants) and R3 §D L125 ("self-host first, hosted later"). L10 now reads "for your teams and, later, your customers": "later" is sequencing, matching R3 §A L87 ("Audience 3 a later channel"), not a demand condition, and L40 states the right unconditionally. Residual wording: A13. |
+| A1 | ADVISORY | closed | L4 "Inputs: R1 APPROVED v2, R2 APPROVED v2, R3 APPROVED v4" (= R2 L3). Grep of v2: no "R2 v2" and no "re-verification pending"; the only "pending" left (L48) is trademark clearance, and "re-verification" (L4) is VISION's own status. |
+| A2 | ADVISORY | closed | L8 "(ownership and deal terms UNVERIFIED)", matching R3 §4 L55, R3 §C L113, R2 §5 L76. |
+| A3 | ADVISORY | closed | L8 "Free OSS conductors, several with servers or self-host, contest the team segment and partly occupy the self-hosted slot (R1 §3b, §5; R2 §5; R3 §C)" = R2 L78 "not merely offline desktop apps", R3 L114 "partially occupy the self-hosted slot". |
+| A4 | ADVISORY | closed | L18 "Ona is closed to new customers (R1 §4; R2 §4; R3 §4)" = R2 L68. Residual: the same bullet still says "Coder and Ona sell", which reads against R2 L68 (existing organisations only); folded into A12. |
+| A5 | ADVISORY | closed | L8 "(R1 §3a, §4)", "increasingly" gone (= R1 L175); "not the UI" gone (grep: only in the Review log L105); L32 "(R1 §3d, Analysis)" (= R1 L225); L36 "(R1 Analysis; R3 §A, §C)" (quoted phrase = R3 L87); L46 "First slice (R2 Three-month scope)" (= R2 L166); L75 "R3 §G item 7; R2 Open questions" (Cursor = R2 L189). The bullet splits introduced two new misallocations: A15. |
+| A6 | ADVISORY | closed | L54 "Adapters implement one normalized interface and declare per-agent capabilities; parity is never assumed" = R2 L88 ("unequal capabilities", normalize `capabilities`) and R2 L43. |
+| A7 | ADVISORY | closed | L59 "at least two adapters" (= R2 L110); L10 "branding (Enterprise)" (= R3 L102). Consistent with L42 "Core: ... all adapters". |
+| A8 | ADVISORY | closed | Labels now carried: gap L8 "both MED" (R1 L221, R3 L118); licence L42 "MED" (R3 L193); wedge L44 "viable HIGH; preferred MED" (R3 L130); pricing L44 "MED" (R3 L195); architecture L46 "advisory preference, MED" (R2 L162), with "D ... first" (R2 L162); L10 hour claim "LOW: scope undefined, open question 3" (R2 L191; OQ3 is L76). |
+| A9 | ADVISORY | closed | L66 lists all seven R3 §G experiments in R3's order (R3 L177 to L183) under "R3 Recommendations, HIGH" (= R3 L197); L70 day-90 rule matches R3 L173 (40%, 20%, 2 paid pilots, 30 days, re-scope). |
+| A10 | ADVISORY | closed | L48 "A USPTO knock-out search returned 0 records for both; full USPTO, EUIPO and UKIPO clearance is pending; `cuelist` has weak distinctiveness" = R3 L64 (EUIPO/UKIPO not checked), L67, L68 (USPTO 0), L137 (term of art), L139 (full searches). |
+| A11 | ADVISORY | closed by lead | The lead diffed v0.1 (git) against v2: five v0.1 principles restated, two added, none dropped. v2 L52 adds "all stay open to challenge in HLD-000". Reviewer did not read v0.1 (no git); the seven principle tags (5 kept/restated/split/extended/qualified, 2 added) are consistent with the lead's count. |
+| A12 | ADVISORY | partially | Split: v1 L15 into L15/L16, v1 L16 into L17/L18, v1 L17 into L19/L20, v1 L34 into L35/L36; "How this repo works" is one paragraph (L85); "Changes from v0.1" is four bullets. Still multi-fact: L18 (Coder sells; Coder's governance is paid; Ona closed) and L21 (unchanged from v1 L18: worktrees; containers; microVMs). Body 10,982 B, so 18 B headroom. Fix: split L18 into a Coder bullet and "Ona serves existing customers only (R2 §4)"; split L21 after "credentials". |
+
+### Re-checked citations (new or changed in v2, and v1 partly / not there)
+
+| # | Citation (v2 line) | v2 claim | What the section says | Verdict |
+|---|---|---|---|---|
+| r1 | R1 §3a, §4 (L8) [v1 #2 P] | teams run parallel agents on isolated copies, review and merge; every vendor ships its own surface | §3a L101 to L115 worktrees, isolated VMs, diff review and PRs; §4 L175 "Every major agent vendor ships its own surface"; "increasingly" dropped | S |
+| r2 | R1 §1; R3 §4 (L8) [v1 #3 P, unchanged] | alive, proprietary, vendor-owned; 11-04 join and wind-down; 11-12/13 reversal; no self-host, GitHub-only cloud, unsandboxed local | dates, reversal, self-host, cloud and local all in R3 L50, L54, L55; "proprietary" is only in R1 table 3e L150 and R3 §C L113 | P (A15) |
+| r3 | R1 §3b, §5; R2 §5; R3 §C (L8) [changed, A3] | OSS conductors with servers or self-host; contest the team segment; partly occupy the self-hosted slot | R1 L121 to L124 (T3 Code control plane, Orca own cloud, Paseo daemon and Hub, Herdr); R1 L206; R2 L78; R3 L114 | S |
+| r4 | R1 Analysis; R3 §C; both MED (L8) [label added] | the three-part gap | R1 L221 to L224 "(MED, inferred ...)"; R3 L118 "(MED)" | S |
+| r5 | R1 §1, §2, Recommendations O2a (L14) [O2a label checked] | incumbent shipping; stranded wedge carries a BLOCKING con | O2a (L235) is the "Conductor refugees" option; L237 "[BLOCKING] the premise is false"; §1 releases; §2 L91 trust | S |
+| r6 | R1 §5 (L15) [new by split] | Agent HQ hosts Claude and Codex in public preview; not every vendor surface is single-vendor | §5 L201 says only "cross-vendor"; "Claude and Codex ... in public preview" is §3a L112 and §4 L176; "Not every vendor surface is vendor-locked" is Analysis L219 | P (A15) |
+| r7 | R1 §3a, §5 (L16) [new by split] | Claude and Cursor offer customer-side execution; Cursor's loop stays in the vendor cloud | L102, L109; §5 L201 | S |
+| r8 | R1 §3c, §4; R3 §4 (L17) [new by split] | "build from scratch" only partly true; Stripe, Ramp, Spotify built in-house | R1 §4 L185 to L187; "only partly true" is R1 Analysis L220; R3 §4 (L48 to L61) has no Stripe, Ramp or Spotify; R3 §A L81 does | P (A15) |
+| r9 | R1 §4; R2 §4; R3 §4 (L18) [changed, A4] | Coder and Ona sell; Coder's governance paid; Ona closed to new customers | R1 L180, L181; R2 L67, L68; R3 L60 | S |
+| r10 | R1 §2, §3b, Analysis (L19) [new by split] | local conductor commoditised: 20+ tools, 3-day rebuild, two monetisation failures | R1 L217 (all three, HIGH); L83 rebuild; L127, L128 shutdowns; O2b L240 "documented monetisation failures" | S |
+| r11 | R1 §5; R3 §3 (L20) [v1 #10 C, B1] | Conductor Teams and Paradev Team $60 per user; Devin Teams $80 a month flat for up to 100 users; "Teams still pay" | R1 L205 all three prices, units match; R3 L41 "Per team flat fee"; R1 L205 hedges "existed or exist" and R3 L50 says Conductor's pricing page is archived | P (A14) |
+| r12 | R1 Recommendations: real, MED (L25) [v1 #12 N, B2] | audience 1 confidence | L256 "real — MED" | S |
+| r13 | R1 Recommendations: real but contested, MED (L26) [v1 #14 N, B2] | audience 2 confidence | L257 "real but contested — MED" | S |
+| r14 | R1 Recommendations O2b; R3 §A (L26) [O2b label checked] | the user and adoption funnel; free OSS and vendor bundles cap the price | O2b (L238) is "team governance"; L239 "OSS install as the funnel"; L240 "crowded with free tools and vendor bundles"; "cap the price" is the L257 verdict in the same section; R3 L87 | S |
+| r15 | R1 Recommendations: not evidenced, LOW (L27) [new, B2] | audience 3 confidence | L258 "not evidenced — LOW" | S |
+| r16 | R3 §A: MED, absence of evidence (L27) [v1 #17 P] | 3a not a launch audience | L84 "Not a launch audience. (MED: absence of evidence.)" | S |
+| r17 | R3 §A: LOW (L27) | 3b later channel, direct conversation | L85 "(LOW: two self-reported signals, no identified buyer.)" | S |
+| r18 | R1 §3d, Analysis (L32) [v1 #19 P] | not a workflow engine; may use one as a substrate | §3d L141 to L144; Analysis L225 "a possible substrate" | S |
+| r19 | R3 §D (L35) [new by split] | not a hosted-first cloud | L125 hosted-first "[BLOCKING]"; L130 | S |
+| r20 | R1 Analysis; R3 §A, §C (L36) [v1 #21 P] | not "a better Conductor UI"; UI commoditised; invest in policy, gate, audit, adapters | R3 L87 quoted phrase; R3 L120 "treat the UI as commoditised and invest in the policy/gate/audit layer and adapters"; R1 L217 "local conductor is commoditised" | S |
+| r21 | R3 §B, §D (L40) [new, B3] | customer, open and self-host-first invariants | L91 customer and open (OSI-approved); L125 "self-host first, hosted later"; L128 "open" as defined in §B | S |
+| r22 | R3 Handoffs (L40) [new, B3] | eliminations "rest on these and reopen only if they change" | L212 "rest on VISION v0.1 invariants and reopen if those change"; "only" is not in R3, and R3 L91 adds they are conditional on principles "to be challenged in HLD-000" | P (A13) |
+| r23 | R3 §B; Recommendations, MED (L42) [label added] | Apache-2.0 plus source-available `enterprise/`; four licences fail the customer invariant, SSPL the open one | L100 verdict; L193 "MED — Licence" | S |
+| r24 | R3 §D: viable HIGH; preferred MED (L44) [label added] | wedge sequence | L130 "(HIGH that 1 is viable ...; MED that 1 beats 3 or 4 ...)" | S |
+| r25 | R3 §B; Recommendations, MED (L44) [label added] | pricing | L104; L195 "MED — Price Enterprise per conducting user" | S |
+| r26 | R2 options analysis verdict; advisory preference, MED (L46) [v1 #27 P] | B inside C; A standalone and D first eliminated; E spiked against B in HLD-000 | L162 "eliminate A standalone and D first; B, C and E remain viable ... Advisory preference (MED): B first, within C's boundaries"; L151 "spiked against B during HLD" | S |
+| r27 | R2 Three-month scope (L46) [new] | first slice: two agents, two executors, at most two Git hosts | L166 "at most two Git hosts"; L169 worktree `trusted-local` and hardened container; L170 "two production-path adapters" | S |
+| r28 | R3 §5, §E (L48) [changed, A10] | USPTO 0 for both; full and EUIPO/UKIPO pending; cuelist weak distinctiveness; `.dev` or `.io` open | L64, L67, L68, L137, L139; `.io`/`.dev` status L137 (the open question itself is R3 L206) | S |
+| r29 | R2 §2, Analysis; R3 §C (L54) [v1 #29 P] | one normalized interface, declared capabilities, no parity; ACP, MCP, A2A complementary; API-key and enterprise billing | R2 L88, L43, L49; R3 L120 "API-key and enterprise billing from day one" | S |
+| r30 | R3 Recommendations, HIGH (L66) [v1 #37 narrowed] | all seven §G experiments before any HLD | L197; the seven names match L177 to L183 in order | S |
+| r31 | R3 §G (L70) [new] | day-90 rule | L173, exact | S |
+| r32 | R3 §G item 7; R2 Open questions (L75) [v1 #40 P] | Anthropic, OpenAI, Google and Cursor in writing | R3 L183 Anthropic, OpenAI, Google; R2 L189 Anthropic, OpenAI, Cursor, Kiro | S |
+| r33 | R2 options analysis verdict (L78) | B or E HLD-000 spike | L151, L162 | S |
+| r34 | R3 §5, §E (L81) [changed] | full clearance for both; `.dev` or `.io` | L139; L137 | S |
+
+Not tallied: L10 "open question 3" is an internal cross-reference; OQ3 (L76) does ask what "onboard in an hour" includes.
+
+### New findings
+
+No new BLOCKING finding. Three new ADVISORY findings; their fixes net to -3 B (python byte count of each old and new string), so the body stays under 11,000 B.
+
+**A13 [ADVISORY] L40 "reopen only if they change" is stronger than R3**
+
+- L40: "The licence and wedge eliminations below rest on these and reopen only if they change (R3 Handoffs)."
+- R3 Handoffs L212: "rest on VISION v0.1 invariants and reopen if those change". R3 §B L91 adds that both eliminations "are conditional on VISION v0.1, whose principles are 'to be challenged in HLD-000'".
+- "only" is not in R3. It also sits awkwardly with L52 ("all stay open to challenge in HLD-000"), since "self-host first, hosted later" is both an invariant (L40) and a principle (L58).
+- Fix (-5 B): delete "only".
+
+**A14 [ADVISORY] L20 "Teams still pay" is in the present tense; R1 hedges it**
+
+- L20: "Teams still pay: Conductor Teams and Paradev Team $60 per user; Devin Teams $80 a month flat for up to 100 users (R1 §5; R3 §3)."
+- R1 §5 L205: "team plans existed or exist at $50–80". R3 §4 L50: Conductor's pricing is from an archive of 2026-09-29, and "the live page redirects to the homepage". R1 L51: Conductor Teams is "invite-only".
+- The units are now correct (B1 is closed); only the tense goes beyond the sources for Conductor.
+- Fix (+12 B): "Team plans exist or existed:" in place of "Teams still pay:".
+
+**A15 [ADVISORY] The v2 bullet splits left two citations on the wrong sibling section; one v1 partial remains**
+
+- L15 "(R1 §5)": §5 L201 says only "cross-vendor". "hosts Claude and Codex in public preview" is R1 §4 L176 (and §3a L112); "not every vendor surface" is R1 Analysis L219. In v1 this sentence shared "(R1 §3a, §5)" with L16. Fix (+10 B): "(R1 §4, Analysis)".
+- L17 "(R1 §3c, §4; R3 §4)": R1 §4 L185 to L187 hold Stripe, Ramp and Spotify; "only partly true" is R1 Analysis L220; R3 §4 (L48 to L61) has none of it, while R3 §A L81 does. Fix (+4 B): "(R1 §4, Analysis; R3 §A)".
+- L8 "(R1 §1; R3 §4)" (v1 #3, partly, unchanged): "proprietary" is in R1 table 3e L150 and R3 §C L113, not §1 or §4. "which defined the category" is not stated in R1 or R3 (it may be carried over from v1; I did not flag it then). Fix (-24 B): delete ", which defined the category," and cite "(R1 §1; R3 §4, §C)".
+- These are partial citations, not "not there": in each group at least one cited section holds part of the claim, so they are graded P, as in v1 (rows 19, 21, 40).
+
+### Rule 5 and form
+
+- Em-dashes 0, en-dashes 0; the only non-ASCII character is `§` (python scan).
+- Rule 5: no `http://`, `https://`, `www.`, `@`, `~/`, `/Users` or `.com` (0 hits); no personal names or handles; "the maintainer" is gone. Repo paths in L85 are repo-relative, and `docs/design/TEMPLATE-HLD.md` exists (ls).
+- Size: body before `## Review log` is 10,982 B (in range, 18 B headroom); total with the 15-row Review log is 12,474 B. I applied the lead's "body under 11,000 B" convention; if the bound applied to the whole file, it would fail.
+- Bullets: all split except L18 and L21 (A12, partially). Principle bullets stay compound by design.
+- Thesis discipline (d) re-checked: L8 "reversed course on 2026-11-12/13", L14 "still shipping"; nothing implies a shutdown.
+- Hypotheses labelled: L10 "hypothesis, LOW" with a reason; audiences, gap, licence, wedge, pricing and architecture all carry labels (A8).
+
+### v1 handoffs, status on disk
+
+- R1 O2b L239 "about $50–80 per seat": still open (R1 not revised).
+- R1 §4 L181 Ona: still open.
+- R3 header L3: closed ("Status: APPROVED v4").
+- PHASE-1 L3 R2 status: closed ("R2 APPROVED v2 (2026-11-25)").
+- PHASE-1 L21 "desktop tools": closed ("free OSS desktop tools and OSS servers").
+- PHASE-1 §G experiments: partially. L29 now asks VISION for "R3 §G's other experiments and the day-90 rule", but I found no row that schedules running them before HLD-000.
+
+### Updated citation tally
+
+- v2 has 56 citation groups (47 in v1; the bullet splits and the new invariants, day-90 and label citations add groups). I re-checked 34 groups (rows r1 to r34). The other 22 keep their v1 citation and claim (some reworded, for example L59 per A7, checked in the A-rows); all 22 were S in v1, and their v2 text still matches the v1 table rows.
+- Tally: 51 supports, 5 partly (r2, r6, r8, r11, r22), 0 not there, 0 contradicts.
+- v1 was 36 / 8 / 2 / 1 (47). All v1 "not there" and "contradicts" grades are cleared; 7 of 8 v1 partials are cleared (v1 #3 remains as r2); r6, r8, r11 and r22 are new partials from v2 text.
+
+### Final verdict
+
+APPROVE: B1 to B3 are closed on disk; A1 to A11 are closed (A11 by the lead's v0.1 diff); A12 is partially done; new A13 to A15 are ADVISORY, bounded and fundable within the 18 B headroom, and no new BLOCKING finding was found.
+
+### Learnings / mistakes (re-verification run)
+
+- I first planned to grade L17 "(R1 §3c, §4; R3 §4)" as supported because v1 row 9 had graded the combined bullet S; I caught it when an R3 grep for Stripe found no hit in §4; rule: re-grade every citation that a bullet split re-attached, not only the sentences whose text changed.
+- My v1 row 9 note "R3 L60 (Ona drift: A4)" read as if R3 mentions Ona; an R3 grep found no "Ona" anywhere, so R3 §4 supports only the Coder half of L18 (R1 §4 and R2 §4 carry Ona); rule: write each line reference so it names what it supports.
+- My working notes put R2's weeks 3 to 5 and 6 to 8 at L168 and L169; a line print showed L169 and L170 before I wrote row r27; rule: print the line before quoting its number.
+- "which defined the category" (L8) is unsourced and may have been in v1, where I did not flag it; rule: on re-verification, read the whole thesis again, not just the changed clauses.
+- My first byte deltas for the A15 fixes were estimates (+11, +1, -23); a python count of each old and new string gave +10, +4, -24, and I corrected them; rule: compute byte budgets, never estimate them.
+- My first draft of these learnings had a "nearly passed the size check" item that did not happen (I computed body and total in the same step); I removed it after auditing it against my steps; rule: audit each learning against what was actually run.
+- Author's mistakes (generic form, for the corpus): splitting a multi-fact bullet without re-allocating its citations per new sentence (A15); strengthening a source's "if" into "only if" when restating it (A13); making a hedged source's tense present (A14).
