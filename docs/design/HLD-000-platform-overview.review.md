@@ -206,3 +206,114 @@ One row per active requirement (33 FR + 10 NFR). “Satisfied” means a coheren
 - Caught the HLD treating a database connection as automatic approval-write authority; checked PRD identity rule against official Postgres privilege grants. Rule: eliminate the actual privilege set, not a broader deployment assumption.
 - Caught one invariant tagged BLOCKING for native plugins but ADVISORY for still-in-server Wasm; compared both against the exact PRD FR-29 exclusion. Rule: propagate invariants to attractive survivor variants as well as rejected options.
 - Caught omitted monetary warnings by checking each PRD FR rather than trusting the HLD Requirements summary. Rule: acceptance behavior, not a requirement-ID mention, is coverage.
+
+## Re-verification (v2)
+
+> status: COMPLETE (REVISE); DRAFT v2 re-verified on disk, 2026-11-26.
+
+### Final verdict
+
+**REVISE** on document quality: new BLOCKING findings 21-22 require one omitted no-Postgres elimination and one supported candidate-policy elimination rationale. Historical findings 1-20 are closed for their specified issues. The seven R3 §G experiments remain an external approval hold owned by the maintainer, not a document-quality finding.
+
+### Per-finding re-verification
+
+| Finding | Tag | Status | Actual v2 evidence and reopened source |
+|---|---|---|---|
+| 1 | BLOCKING | closed | §3.3 Option 4 ll458-462 uses table-scoped grants, explicitly excludes gate/approval/audit writes, and makes it viable; PRD FR-17 l121 forbids self-approval, not scoped database connectivity. LLD privilege test is a bounded follow-up. |
+| 2 | BLOCKING (v1 approval hold) | closed as document-quality finding; external hold remains | §3.2 ll388-390 and P0 record ll55-66 expressly keep the pilot tier unresolved; Action Item 3 l886 blocks approval. PRD handoff 3 l202 permits marking the tier unresolved while experiments are unrun. The maintainer still owns the seven R3 §G experiments, not a reviewer-requested text fix. |
+| 3 | BLOCKING | closed | §3.2 Option 3 ll409-413 keeps local container execution and retags hosted-provider cost ADVISORY; table ll429-434 lists it viable, consistent with R3 §3 l43 (E2B Hobby free/credit) and PRD NFR-7 l150 (no paid sandbox required for clean workflow). |
+| 4 | BLOCKING | closed | §5 Options 3/5 ll603-619, table ll635-640 and I7 l154 permit extra Compose services, not a separately installed cluster; R2 §3 ll54,57 supports higher operations cost and Trigger.dev Compose, not the former categorical elimination. §5 Option 4 l612 retains I2 BLOCKING as R2 §Analysis/Durability l102 expressly requires. |
+| 5 | BLOCKING | closed | §7.1 ll709-715 puts two hosts first provisionally and one host conditional on GitHub-only pilot demand; P0 l46, Requirements l78, Out of Scope l113, Action Item 5 l888 preserve PRD option set 3 ll92-95 and conditional FR-20 l124. Pilot selection is an approval hold, not a defect in an explicit conditional option. |
+| 6 | BLOCKING | closed | §4 Option 4 ll514-518 is baton-placed A2A, now viable with ADVISORY protocol limitations; R2 §2 l49 denies inherent filesystem/process visibility, not baton-controlled placement. Table l538-539 removes unsupported BLOCKING. |
+| 7 | BLOCKING | closed (presentation only) | §6.2 Option 5 l672 now separately lists a pro, BLOCKING/advisory cons and con-1-only verdict; table l699 and Appendix A l857 display the option. Whether I4 *actually* supports this elimination is a separate substantive defect, finding 22. |
+| 8 | BLOCKING | closed | §10.1 Option 3 l798 means packages *alongside* mandatory Compose, explicitly contrasting packages-only as I7-failing; l812 lists packages viable. PRD FR-31 l135 requires the Compose path. |
+| 9 | BLOCKING | closed | Requirements l79 and §6.4 Option 1 l686 specify configured repo/org monetary threshold, audited warning visible in team API/CLI, separate hard stop, plus opaque-charge unknowns; PRD FR-25 l129 requires each behavior. |
+| 10 | BLOCKING | closed | §1 step 7 l203, §5 diagram ll567-579, terminal-state rule l582, and §11 l839 now separate Cancelled, TimedOut, Failed and explicitly unresolved NeedsReconciliation; PRD FR-13/24 ll117,128 are reflected. |
+| 11 | BLOCKING | closed | §10.2 l802 refuses writes/claims from backup to acceptance, preventing committed audit loss on ordinary rollback; §5 l584 and §11 l836 separately disclose last-backup recovery after disaster. PRD NFR-8/10 ll151,153 does not promise zero-loss disaster recovery. |
+| 12 | BLOCKING | closed | §2 Option 2 ll268-270 gives full C a pro, four ADVISORY cons, no BLOCKING, and a sequencing rationale; §2 verdict l343 retains Options 1-4, excluding only 5-7 by BLOCKING. R2 §Options C ll132-137, verdict l162 explicitly keep C viable but prefer B inside C. |
+| 13 | ADVISORY | closed | §9.1 Option 4 l769 is now specifically a *fork instead of a versioned boundary*, not an arbitrary fork; the I8 tag is confined to the no-contract variant (PRD FR-29 l133). |
+| 14 | ADVISORY | closed | §6.1 Option 4 l657 now specifically requires *PR-triggered* checks before PR and explicitly distinguishes branch-push checks; PRD FR-16 l120 requires both phases at the candidate SHA. |
+| 15 | ADVISORY | closed | §3 intro l349 names provider lifecycle, checkout/artifact transfer, egress/secrets, failure ownership, and Coder/Codespaces examples; §3.2 l409 includes Codespaces. R2 §Options C ll132-137 and §4 l71 cover the backends. Detailed payloads appropriately stay outside HLD. |
+| 16 | ADVISORY | closed | §2 Option 1 pro 3 l257 restricts the Apache claim to baton-owned first-party core code and retains dependency checks in Action Item 11 l894; R3 §B ll100-102 supplies the edition split. |
+| 17 | ADVISORY | closed | Action Items 2/7/10/11 ll885,890,893-894 assign owner roles and name pre-approval §2 choice, retention default, optional Trigger.dev admission and core dependency admission; PHASE-1 ll14-16,39-42 places component LLD after HLD approval. |
+| 18 | ADVISORY | closed | §5 ll549-584 describes record categories/high-level states rather than entity schema, §6.3 l676 expressly leaves field inventory to LLD; TEMPLATE-HLD forbids implementation-class/config/test names, not architecture state names. |
+| 19 | ADVISORY | closed | Body before Review log is 71,892 B on disk, under the explicitly raised 72,000 B v2 cap by 108 B (independent byte count); the complete §2 full-C comparison and fixes remain present. |
+| 20 | BLOCKING | closed | I8 l155 and §9.1 Option 3 l767 forbid in-server untrusted Wasm on I8 alone; table l785 and Appendix A l861 match. PRD FR-29 l133 expressly forbids untrusted server plugins. |
+
+### Changed-option re-audit
+
+| Sub-decision | Options / tags | Verdict and consistency | Result |
+|---|---|---|---|
+| §2 Control plane | 7; 5(I2), 6/7(I1) BLOCKING | Full C Option 2 is viable with explicit R2 §Options C ADVISORY cons; 1-4 survive and B-inside-C wins on advice, not an invariant. Renumbering matches §2 l343, Appendix A ll854-855 and Action Item 2 l885. | clean |
+| §3.1 Tier model | 4; 2/3(I3), 4(FR-10) BLOCKING | Worktree + container and explicit trust labels remain mandatory (PRD FR-4/10/11); alternatives have Pros, tagged Cons and con-only verdicts. | clean |
+| §3.2 Lower-trust default | 5; no BLOCKING | Conditional container; hosted default with local path is viable (R3 §3 l43), own microVM and unknown user-space runtime remain advisory; PRD handoff 3 l202 explicitly permits unresolved pilot tier. | clean; external pilot approval hold |
+| §3.3 Runner contract | 4; no BLOCKING | Scoped direct-DB role is viable; con for grants/testing, exposure and schema coupling is advisory. Preferred outbound lease matches R2 §Options B and FR-12/14. | clean |
+| §4 Agent contract | 6; 3(FR-13/5) BLOCKING | A2A remains viable with baton placement beyond the wire; MCP-alone cannot transport supervised agent sessions (R2 §2 l49). Pros, tagged Cons and Why statements complete. | clean |
+| §5 Durability | 7; 4(I2) BLOCKING in document | Temporal and Trigger.dev now viable on extra services; bundled BSL/SSPL remains rightly eliminated (R2 §Analysis/Durability l102). **Option 7 with no Postgres must also be eliminated or redefined** (PRD P0 ll62-64). | finding 21 BLOCKING |
+| §6.1 Gate placement | 4; 2/3(I6), 4(I5) BLOCKING | PR-triggered CI is distinct from branch-push CI; current preferred gate owns pre-PR checks, host owns later checks (FR-16/18). | clean |
+| §6.2 Policy representation | 5; 5(I4) BLOCKING in document | The newly named own-candidate-branch option has Pros/Cons and con-1-only verdict. But FR-17 does not show that a separate human reviewer is bypassed; unauthorised policy *authority* instead implicates FR-21/26. | finding 22 BLOCKING |
+| §6.3 Audit write | 3; 2(I9), 3(FR-23) BLOCKING | Same-transaction preferred; asynchronously committed decisions and mutable activity feed fail approved audit guarantees. | clean |
+| §6.4 Budget point | 3; 2/3(I10) BLOCKING | Local disconnected stop and central concurrency necessary; monetary threshold warning/unknown price also specified (PRD FR-24/25; R2 §Analysis/Execution). | clean |
+| §7.1 Host breadth | 4; 4(FR-18) BLOCKING | Two hosts provisionally preferred, one-host option viable if pilot evidence supports it (PRD option set 3); alternative lacking PR/status surface fails FR-18. | clean; pilot selection approval hold |
+| §7.2 Candidate writer | 3; no BLOCKING | Server-only Git write preferred; per-run runner/agent push variants survive on advisory secret/staleness risks. | clean |
+| §8 Identity and tenancy | 4; no BLOCKING | One-org dimension, APIs scoped by repo; all alternatives viable but later multi-org has operational/advisory costs. | clean |
+| §9.1 Extension mechanism | 4; 2/3/4(I8) BLOCKING | In-server native/Wasm untrusted code and no-boundary fork fail PRD FR-29 l133; out-of-process or compiled-in preferred. | clean |
+| §9.2 Edition packaging | 4; 2(I2) BLOCKING | Core-only build explicit; mixed commercial binary fails R3 §B clean-core packaging. | clean |
+| §10.1 Install | 3; 2(I7) BLOCKING | OS packages now additional rather than a substitute; Kubernetes-*instead* still fails Compose path (PRD FR-31). | clean |
+| §10.2 Upgrade | 3; no BLOCKING | All variants survive; forward-only backup/freeze/acceptance rollback is an advisory choice, compatible with §5 retention and NFR-8. | clean |
+
+The document lists **73 options, 22 BLOCKING cons and 22 eliminated options** across 17 sub-decisions. Structural Pros/Cons/Why and BLOCKING-only elimination table entries are present for each; source-level re-audit reveals one omitted BLOCKING classification and one unsupported I4 label. A con shared by all options is not labelled BLOCKING; §2 expressly marks common neutrality/sandbox work ADVISORY. Appendix A ll850-866 mechanically mirrors all 22 current tags, but its **I7 omission of §5 Option 7** and its substantively unsound **I4 row** are part of findings 21 and 22.
+
+**Changed-citation spot checks.** These reopen approved sources, rather than merely accepting the author's Review log. Grades assess the exact revised claim; previous v1 citation checks remain historical.
+
+| HLD v2 claim | Reopened approved source | Grade | Reason |
+|---|---|---|---|
+| §2 full C ll268-270,343 | R2 §Options C ll132-137; R2 verdict l162 | supports | Full C viable, matrix cost advisory and B-inside-C preferred on sequencing. |
+| §2 embedded-Coder I2 l306 | R2 §Options E ll146-151; R3 §B ll100-102 | supports | Embedding AGPL conflicts with selected Apache core; customer-installed API use differs. |
+| §3.2 hosted default l412 | R3 §3 l43; PRD NFR-7 l150 | supports | Hobby free exists; clean local path means no paid sandbox is required. |
+| §3.2 conditional tier l390 | PRD §Handoffs item 3 l202 | supports | Explicitly permits marking pilot tier unresolved while validation remains unrun. |
+| §3.3 scoped DB role l461 | PRD FR-17/26 ll121,130; R2 §Analysis/Self-host l106 | partly | Sources define prohibited authority; future LLD privilege test establishes scoped grants, not R2 itself. No longer used as BLOCKING. |
+| §4 baton-placed A2A ll514-518 | R2 §2 l49 | supports | A2A lacks implicit supervisor visibility but does not bar out-of-protocol placement. |
+| §5 Temporal/Trigger.dev ll603-619 | R2 §3 ll54-58; PRD FR-31 l135 | supports | Extra services and Compose deployment are advisory; external workflow cluster is not sourced as mandatory. |
+| §5 bundled BSL/SSPL l612 | R2 §Analysis/Durability l102; R3 §B ll100-102 | supports | Explicit BLOCKING for bundled non-OSI durable server, not for optional operator install. |
+| §5 no-Postgres Option 7 l630 | PRD §P0 Scope ll62-64; FR-31 l135 | contradicts | P0 explicitly installs Postgres; option is marked viable with only ADVISORY con (finding 21). |
+| §6.2 own-candidate policy I4 l672 | PRD FR-17/21/26 ll121,125,130; HLD §6.1 l648 | partly | Agent editing effective policy threatens admin authority, but the cited no-self-approval rule alone does not erase a separate human approval (finding 22). |
+| §6.4 threshold warning l686 | PRD FR-25 l129; R2 §Analysis/Execution l92 | supports | Configured monetary warning, distinct optional cap and unknown opaque charges all covered. |
+| §7.1 host priority ll709-711 | PRD option set 3 ll92-95; FR-20 l124 | supports | Two hosts provisional; one host conditioned on GitHub-only pilot evidence. |
+| §9.1 in-server Wasm I8 l767 | PRD FR-29 l133; R2 §Analysis/Self-host l108 | supports | Untrusted plugin code in the server is expressly prohibited, confinement does not change its placement. |
+| §10.1 Compose/packages ll794-798 | PRD FR-31 l135 | supports | Packages alongside Compose viable; substituting packages violates mandatory install path. |
+| §10.2 freeze, audit ll802,584 | PRD NFR-8/10 ll151,153; R2 §Analysis/Durability ll98-102 | supports | Upgrades and restore boundary documented; no committed write during rollback window, disaster backup recovery separately disclosed. |
+
+### Requirement and contradiction pass
+
+| Requirement / invariant | v2 behavior and evidence | Review |
+|---|---|---|
+| FR-20 conditional P0 | P0 ll46,78, Out of Scope l113 and §7.1 ll709-711 preserve PRD option set 3 A as provisional and B only on GitHub-only demand; survey Action Item 5 l888 resolves before HLD approval. | Covered conditionally by design; pilot demand not measured, so do not claim FR-20 was executed or finally demoted to P1. |
+| FR-25 monetary warning | Requirements l79, §6.4 l686 specify configured threshold, visible audited warning, separate optional hard cap, opaque unknown, API/CLI. | Satisfied by design against PRD FR-25 l129. |
+| FR-29 plugin boundary | I8 l155 and §9.1 ll763-769 rule out untrusted in-server plugins, including Wasm; unsupported versions rejected. | Satisfied by design against PRD FR-29 l133. |
+| FR-31 / NFR-9 install/licensing | §10.1 ll794-798 supplies one Compose path; §5 Option 4 l612 excludes bundled BSL/SSPL; §9 ll759,773-779 keeps core separate from Enterprise. | Preferred architecture satisfies both; comparison's no-Postgres Option 7 conflicts with approved P0 scope, finding 21. |
+| FR-13/14/24 and FR-2 outcomes | §1 l203, §5 ll553-584 and §11 ll831-839 separate member cancel, timeout, failure, rejected/merged and explicit unresolved reconciliation, with fenced requeue. | Satisfied by design; timeout is no longer labelled Cancelled. |
+| FR-21/26, policy authority | §6.2 ll661-672 defines admin-only loosening but also eliminates own-candidate-branch policy on I4, not on the cited admin authority. | Preferred option satisfies by design; invalid alternative rationale is finding 22. |
+| FR-22/23, NFR-5/8/10, audit and restore | §5 ll549,582-584, §6.3 l676, §10.2 l802 and §11 ll833-837 keep audit atomic, append-only, redacted, backed up and never product-purged; upgrade freeze precludes committed write loss on routine rollback. Disaster restore explicitly returns to last backup. | Satisfied by design; no claim of zero-loss disaster recovery. |
+
+Coverage across **33 active FR plus 10 NFR**: 39 satisfied by HLD design/test boundary, 3 deferred P1 (FR-7, FR-8, FR-30), 1 conditional P1/P0 (FR-20), **0 omitted**. FR-33 withdrawn. This is design coverage, not test execution, and does not repair the two invalid alternative verdicts.
+
+Contradiction search: every occurrence of Cancelled, TimedOut, Failed, NeedsReconciliation, retention, backup, restore and upgrade freeze checked in §1, §5, §10.2, §11 (and references outside those sections). State and restore statements align at the architectural level. §2 option-number references at ll266,270,298,343, Assumption 7 l135, Appendix A ll854-855 and Action Item 2 l885 now point to the expected options after renumbering. Appendix A was reconciled with all 22 displayed tags, subject to findings 21/22.
+
+### New findings
+
+21. [BLOCKING] §5 Option 7, ll627-631, and comparison ll635-640: the alternative explicitly removes Postgres yet carries only an ADVISORY con and survives the BLOCKING-only verdict. Approved PRD §P0 Scope ll62-64 requires the product binary **and Postgres** in one Compose deployment; HLD I7 l154 and P0 Scope l42 repeat that boundary. A single-writer database with no Postgres is infeasible for this P0 option set on the explicit Postgres requirement, regardless of whether its team-concurrency/backup problems can be mitigated. Tag the no-Postgres variant [BLOCKING] under I7/PRD P0, eliminate it in §5's table and Appendix A, or redefine it to retain Postgres and compare the resulting genuinely distinct variant. The independent new finding does not reopen historical v1 finding 4, which concerns unsupported eliminations of Temporal/Trigger.dev.
+
+22. [BLOCKING] §6.2 Option 5 l672, table l699 and Appendix A l857: the cited PRD FR-17 l121 says an execution identity cannot self-approve or merge, but merely *reading policy from the candidate branch* does not necessarily give it authority to skip the unconditional distinct-human gate in §6.1 l648 and §1 steps 10-11 ll206-207. The branch can plainly let an agent change policy controlling its run, raising a genuine **FR-26** admin-only policy-authority problem (PRD ll125,130), but that is not the same as an established I4 self-approval. Retag the candidate-controlled effective policy [BLOCKING] under FR-26 with a precise explanation of how an unauthorised agent edit becomes authoritative; alternatively narrow the option to admin-approved, non-loosening branch policy and keep it viable on advisory grounds. Update the §6.2 table and Appendix A accordingly. The addition of Option 5 *closes the presentation defect* in finding 7; this is a distinct unsupported elimination tag.
+
+### Form and byte budget
+
+Independent disk measurement: HLD **79,194 B whole file; 71,892 B before `## Review log`**, within the permitted **72,000 B v2 body cap by 108 B**. HLD body has zero em dashes and zero raw URLs; source IDs resolve to R1/R2/R3 lists in §References ll868-880. Its named categories and state-level model remain HLD-level (no class names, config keys or test-file names observed). Required sections, Mermaid workflow, numbered steps, option Pros/Cons/Why, comparison tables, appendix, references, role-owned Action Items and Review log are present; Rule 5 finds no operator personal name, employer or internal URL/system. The seven maintainer-owned R3 §G experiments (ll55-66,884) are genuinely UNRUN and still hold actual HLD approval; they are **not** counted as document-quality findings. Revisions to fix findings 21-22 must also keep the 72,000 B body budget.
+
+### Learnings / mistakes (this re-verification)
+
+- Initially accepted §6.2's new Option 5 I4 citation as sufficient because the option now had complete Pros/Cons; rereading the separate-human gate and PRD FR-17 revealed the true issue is candidate-controlled policy authority, not proven self-approval. Rule: verify the exact violated authority rather than approving an elimination for its presentation.
+- The original v1 review did not catch §5 Option 7's no-Postgres contrast; rereading the PRD's explicit P0 deployment scope exposed it. Rule: test surviving alternatives against immutable release scope as carefully as rejected alternatives.
+- A first option-inventory script failed on regex tuple unpacking; corrected the script and independently counted all 73 alternatives and 22 tagged eliminations. Rule: validate automated inventories against the section shape before using their counts.
+- The seven UNRUN experiments still stop maintainer approval, but PRD handoff 3 permits an unresolved pilot tier in a reviewable HLD. Rule: give an independent document-quality verdict rather than relabelling an external experiment hold as a text defect.
+
