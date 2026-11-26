@@ -167,3 +167,67 @@ Totals: 50 cited rows — 42 S, 5 P, 1 F, 1 N (row 33 groups 16 repository check
 - The Spotify page was slow and my fetch got promoted to a background task; piping its output delayed reading it. Fetch slow pages to a file first.
 - The Conductor changelog HTML is paginated (22 pages); fetching page 1 cannot disprove early-release claims, so I recorded them as not re-verified rather than as failures.
 - I initially read [S55] "Deploy in your VPC" as confirming R1's Devin claim; only [S56] (the page R1 actually cites for it) shows the deployment is vendor-hosted. Always open the specific page cited for a technical claim, not the marketing page beside it.
+
+## Re-verification (v2)
+
+> Re-reviewed: R1-market-landscape.md DRAFT v2 (45,079 B, dated 2026-11-25, 12-row Review log). Reviewer: Fable · review R1. Date: 2026-11-25.
+> Method: re-read BRIEF.md Review protocol; read v2 in full; re-fetched every source the Review log says was added or changed ([S102]–[S108], and the re-cited or re-worded [S26][S34][S47][S55][S56][S80][S84]); checked the v2 text at each line the log names; re-ran the rule-5 scan on the whole file. Coder's rendered plan table was read in the built-in browser because the text and `/pricing.md` versions strip the tier marks. R1 not edited; git not run.
+
+### Per-finding status
+
+| # | Tag | Status | Evidence |
+|---|---|---|---|
+| 1 | BLOCKING | closed | [S102] fetched: "Third-party coding agents are currently in public preview"; enabled "in your account settings, your organization policies, or the 'Agents' section of an enterprise's AI controls"; CodeQL and secret scanning of generated code; partner-app actions "visible in your audit log"; agents "consume GitHub Actions minutes and AI credits". [S54] fetched: "three environment choices: Cloud (a cloud sandbox), GitHub Actions-based, and Remote (a connection to a custom environment)"; Actions-based sessions support "self-hosted runners". v2 L111–114, table row L154, L176, L201, L219 and O1 cons L234 match these pages. The URL in my v1 finding returns HTTP 404; the author's [S102] is the live page. |
+| 2 | BLOCKING | closed | [S56] fetched: "Cognition hosts Devin in an auto-scaling, customer-isolated environment within a single-tenant VPC. Your VPC connects via AWS Private Link (or IPSec tunnel)"; brain "always residing in Cognition's Cloud"; "Cognition manages the infrastructure on your behalf"; deployment table puts the Devbox in a "Customer-dedicated single-tenant VPC" hosted by Cognition. [S55] fetched: Teams $80/mo "for up to 100 members", multiplayer sessions, SAML/OIDC SSO; Enterprise "SCIM and role-based access control", "Dedicated deployment option", "Deploy in your virtual private cloud (VPC)". v2 L115–116 and row L155 (Self-host "No") match. Devin/[S56] no longer appear at L200, L201, L234 or L275 (checked by reading those lines). |
+| 3 | BLOCKING | closed | L197: "Numbering follows VISION.md v0.1 and R3 v4 (1 = platform/DevEx, 2 = engineering teams, 3 = B2B2B); v1 of this doc used the reverse order." §5 subsections reordered (L199, L204, L209). O1 L232 is platform/DevEx with the build-own pros [S98]–[S100] and the Coder/Ona/Agent HQ cons; O3 L241 is B2B2B with the no-demand cons; O4 L246 ("O3's multi-tenancy ... O1's single-org hardening") and the advisory preference L253 (O1 design centre, O2b funnel, O3 hypothesis) are consistent with the new numbering; per-audience verdicts L256–258 relabelled and unchanged in substance. Verdict L251 unchanged: O2a remains the only option with a BLOCKING con (L237); every O1/O3 con is ADVISORY, so the verdict still follows from BLOCKING items alone. |
+| 4 | ADVISORY | closed | L55 quotes [S25] in full, including "Announcement:" and "Regularly scheduled updates will resume next week!"; the question is paraphrased as "whether the acquisition had fallen through" with the original "Did acquisition fall through?" quoted; source line L313 names the question post id 2120974877700083950. Matches what I read on the fxtwitter mirror in the v1 review. |
+| 5 | ADVISORY | closed, with a correction to my v1 finding | L10 and L58 stamped "as of 2026-11-23". "Post-draft changes (as of 2026-11-25)" L61–64 cite [S104] (fetched: "Publish an artifact to share it with anyone who has the link"; comments "go to the agent through the chat box") and [S105] (fetched: "work on several repositories at once from within one workspace"; agents "can now add folders, clone repositories and create projects for you, after checking with you first"). L29 cites [S103]; the fetched 0.95.0 page's Misc section reads "Conductor now stores settings in the app instead of .conductor/settings.toml files. Your existing settings are imported automatically." The fetched 0.101.0 page has no settings note. My v1 finding attributed the move to 0.101.0; the author's correction (0.95.0, 2026-11-16) is right. L90 (multi-repo shipped), L207 (legacy files) and L271 (VISION handoff) updated as the log says. |
+| 6 | ADVISORY | partially | Pricing: closed. [S80] fetched: Trial "$0 / 20 box-hours included", Starter "$19 / user / mo", Pro "$99", Max "$249", "Extra usage at $0.40/box-hour", Teams "Custom" with "SSO, SCIM, RBAC", "Audit logs and spend controls", "Dedicated resources & deployment"; L132 and row L166 match; boxes.dev removed from L266. Self-host: still open. The Review log says the page "now says 'Dedicated resources & deployment', not 'BYO cloud / VPC'", but the fetched page contains both: "BYO cloud / VPC" sits in the "Roll it out responsibly" block ("SSO / SAML / OIDC · SCIM provisioning · Role-based access · Audit logs · Spend limits · Concurrency limits · BYO cloud / VPC · Network allowlists"), and "Dedicated resources & deployment" in the Teams card. UNVERIFIED remains a fair label because no tier or mechanism is stated, but the cell should quote both phrases and the log row is factually wrong (new Finding 13). |
+| 7 | ADVISORY | closed | [S84] fetched three ways. Text: Community "Run Claude Code, Codex, Cursor, and other AI coding agents". Rendered plan table (browser): "3rd-party AI agent compatibility (e.g., Claude, Codex)" has a check mark in Community, Premium and AI Premium; "Customizable branding" has a check mark in Premium and AI Premium and none in Community. L137, row L168 and L193 match. |
+| 8 | ADVISORY | closed | [S34] fetched, "Platform restrictions" bullet: "repository cloning in Anthropic-hosted environments and pull request creation require GitHub. ... You can send a GitLab, Bitbucket, or other non-GitHub repository to a cloud session as a local bundle by setting CCR_FORCE_BUNDLE=1, but the session can't push results back to that remote." L103 is a close paraphrase. [S47] fetched: the Integrations line lists eleven partner guides, "AWS Lambda, Cloudflare, Namespace, Modal, Daytona, E2B, Vercel, Tensorlake, Coder, Superserve, and Render"; L109 is correct. My v1 count of ten came from the page's shorter "partner host" list, which omits Coder. |
+| 9 | ADVISORY | closed | L212: "R3 v4 splits this audience into 3a/3b; the embedder sub-segment (3b) is evidenced indirectly by [S47][S101][S84] and remains LOW." Consistent with R3 v4 §A and VISION v0.1. |
+| 10 | ADVISORY | closed | L272 BRIEF handoff reads "no open item"; I re-scanned BRIEF.md for names, handles and profile URLs: none. L284: "Conductor, now developed at Meta per [S22][S26] (deal terms UNVERIFIED)". |
+| 11 | ADVISORY | closed | [S106] fetched: "0.0.16 July 18th, 2025" / "Terminal Improvements". [S107] fetched: "0.13.6 Sept 30th, 2025" / "Bedrock, Vertex, or any Anthropic compatible URL". [S108] fetched: "Support for GitHub enterprise login"; the page metadata carries datePublished "Nov 18th, 2025". L16, L27 and L30 match; L35 now cites [S103] for 0.95.0 agent-as-orchestrator, which the fetched page confirms ("Agents in local workspaces can now start and manage other agents"). |
+| 12 | ADVISORY | closed | L98: "Stars, licences and dates as of 2026-11-23 (GitHub API; popularity, not usage)". L123: "624 community plugins (as of 2026-11-23)". Leaving the figures at their 11-23 values is acceptable once stamped. |
+
+Closed 11 of 12 (all 3 BLOCKING); 1 ADVISORY partially closed.
+
+### Sources added or changed in v2 (all fetched 2026-11-25)
+
+| Source | Result | Note |
+|---|---|---|
+| [S102] docs.github.com about-third-party-coding-agents | S | public preview; enablement via account / org policies / enterprise AI controls "Agents" section; CodeQL + secret scanning; audit log; Actions minutes + AI credits |
+| [S103] 0.95.0 | S | agents start/manage other agents and workspaces; settings moved into the app; Electron |
+| [S104] 0.100.0 | S | artifact publishing by link; comments to the agent via chat |
+| [S105] 0.101.0 | S | multi-repo workspaces; agents add folders / clone / create projects after asking; no settings note |
+| [S106] 0.0.16 | S | July 18th, 2025 |
+| [S107] 0.13.6 | S | Sept 30th, 2025; Bedrock / Vertex / Anthropic-compatible URL |
+| [S108] 0.22.4 | S | GitHub enterprise login; Nov 18th, 2025 (page metadata) |
+| [S26] (source line changed) | S | question post id and wording as verified in v1 |
+| [S34] (wording changed) | S | Platform restrictions bullet quoted above |
+| [S47] (wording changed) | S | eleven partner guides including Coder |
+| [S55] (re-cited) | S | "Dedicated deployment option"; "Deploy in your virtual private cloud (VPC)" |
+| [S56] (re-cited) | S | Cognition-hosted single-tenant VPC; PrivateLink / IPSec; brain in Cognition's cloud |
+| [S80] (new claims) | P | pricing exact; both "BYO cloud / VPC" and "Dedicated resources & deployment" are on the page (Finding 6 / 13) |
+| [S84] (new claims) | S | branding Premium and AI Premium only; agent list; confirmed from the rendered table |
+| [S1] (unchanged; left open in v1) | S | page metadata: founded 2024, 8 employees, San Francisco — closes the v1 "not confirmed" note |
+
+### Rule-5 scan (full file)
+
+Searched v2 for @handles, profile URLs (`x.com/<user>`, `twitter.com/`, `linkedin`, `news.ycombinator.com/user`), "founder of", "co-founder <Name>" and "by <First> <Last>". The only hit is "@meta" inside the quoted bio (a company handle). X posts stay id-only; HN evidence stays comment-id-only; L18 names a product ("cmd"), not a person; the Series A customer list [S4] is not reproduced; the observability vendor at L78 and L188 stays anonymised. Clean. (One re-fetched source page exposes founder names in its metadata; they are not reproduced here or in R1.)
+
+### New findings
+
+**13. [ADVISORY] Review log row 6 misstates [S80].** The row says the page "now says 'Dedicated resources & deployment', not 'BYO cloud / VPC'"; the fetched page says both, in different blocks (see Finding 6 status). The Facts text is not wrong (the cell quotes a real phrase), but the log's stated reason for rejecting the finding is, and the log is part of the publishable record. Fix: row L166 Self-host → `UNVERIFIED (page lists "BYO cloud / VPC" among team rollout features and "Dedicated resources & deployment" for Teams)`; reword Review log row 6 accordingly.
+
+### Final verdict (v2)
+
+**APPROVE.** All three BLOCKING findings are closed against re-fetched primary sources; eight of nine ADVISORY findings are closed and one is partially closed with a one-cell fix; the single new finding (13) is ADVISORY. The Recommendations verdict still follows from BLOCKING items alone, the audience numbering now matches VISION v0.1 and R3 v4, and the rule-5 scan is clean.
+
+### Learnings / mistakes (this run)
+
+- The docs.github.com URL in my v1 Finding 1 returned 404; I had reconstructed the path instead of pasting the one I actually fetched. The author had to find the live page. Cite only URLs copied from a successful fetch.
+- I attributed the settings-into-the-app change to 0.101.0; it shipped in 0.95.0. I had read the RSS feed, where adjacent items blur, instead of opening the per-release page — the exact discipline Finding 11 asked the author to adopt.
+- I counted ten Cursor partner hosts from the first list on [S47]; the page has two lists and the Integrations list has eleven (adding Coder). Read the whole page before stating a count.
+- I rated [S34] "GitHub required" as slightly strong in v1; the page's Platform restrictions bullet literally says "require GitHub" for Anthropic-hosted cloning and PR creation. I had read the intro, not the restrictions section. Search the page for the exact claim before downgrading it.
+- What worked: reading Coder's rendered plan table in the browser and comparing SVG path signatures across rows resolved a tier-mark question that neither the text fetch nor `/pricing.md` could; reusable for JS-rendered comparison tables.

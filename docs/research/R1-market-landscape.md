@@ -1,6 +1,6 @@
 # R1 — Market landscape: conductor platforms
 
-> Status: DRAFT v2 (revised after review, awaiting re-review). Author: Opus · R1 market landscape. Date: 2026-11-25 (facts as of 2026-11-23 unless stamped otherwise).
+> Status: APPROVED v2 (re-verified 2026-11-25 by a different-model reviewer: 3/3 BLOCKING closed, 8/9 ADVISORY closed, Finding 13 ADVISORY open; see R1-market-landscape.review.md). Author: Opus · R1 market landscape. Date: 2026-11-25 (facts as of 2026-11-23 unless stamped otherwise).
 > Research question: the market landscape for conductor platforms (orchestration surfaces for running many coding agents in parallel in isolated workspaces with review and merge flow).
 
 ## Facts
