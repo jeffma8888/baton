@@ -1,6 +1,6 @@
 # PRD-000: Platform product requirements
 
-> Status: DRAFT v1 (awaiting review)
+> Status: APPROVED v1 (reviewed 2026-11-26 by a different-model reviewer: 0 BLOCKING, 21 ADVISORY; see PRD-000-platform.review.md). An advisory pass (v2) is in progress before HLD-000 consumes this document.
 
 ## Facts
 
