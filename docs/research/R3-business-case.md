@@ -1,6 +1,6 @@
 # R3 — Business case: is there a business in an open, self-hostable conductor, and how to position it
 
-> Status: DRAFT v4 (revised after independent review and re-verification, `R3-business-case.review.md`; the Review log is the record). Author: Fable · R3 business case. Date: 2026-11-23.
+> Status: APPROVED v4 (lead on-disk verification 2026-11-23 after independent review and re-verification, `R3-business-case.review.md`; the Review log is the record; header flipped 2026-11-26 after a reviewer noted the mismatch). Author: Fable · R3 business case. Date: 2026-11-23.
 > Research question: is there a business in an open, self-hostable, customizable conductor
 > platform for fleets of coding agents, and how should it be positioned (audience, wedge,
 > licence, pricing, name, launch, metrics)?

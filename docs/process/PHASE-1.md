@@ -1,7 +1,7 @@
 # Phase 1 — from research to an approved platform design
 
-> Status: STARTED 2026-11-25. Inputs: R1 APPROVED v2, R3 APPROVED v4, R2 DRAFT v2 (under
-> re-verification; its BLOCKING-derived architecture verdict is expected to stand).
+> Status: STARTED 2026-11-25. Inputs: R1 APPROVED v2, R2 APPROVED v2 (2026-11-25), R3 APPROVED v4.
+> Open advisory findings on R1 (F13) and R2 (F13-F15) are listed in each doc's status line.
 
 ## Deliverables, in order
 
@@ -18,7 +18,7 @@ the lead flips the status line. Nothing in `docs/plans/` is written before HLD-0
 ## What VISION v1 must settle (from the research)
 
 - Thesis: the incumbent is alive, proprietary and vendor-owned; the cross-vendor incumbent is
-  GitHub Agent HQ; free OSS desktop tools contest the team segment (R1 §1, §2, §5).
+  GitHub Agent HQ; free OSS desktop tools and OSS servers contest the team segment (R1 §1, §2, §5; R2 §5).
 - Audiences in canonical order: 1 platform/DevEx, 2 engineering teams, 3 B2B2B, with R1's
   confidence and R3's 3a/3b split of the third.
 - Licence: Apache-2.0 core + source-available enterprise module; FSL/BSL/ELv2/SSPL blocking
@@ -26,7 +26,7 @@ the lead flips the status line. Nothing in `docs/plans/` is written before HLD-0
 - Wedge and sequence: OSS self-hosted team server + thin client, then hosted, embeddable API
   last (R3). Architecture stance: build option B inside option C's boundaries; A and D
   eliminated (R2 verdict).
-- Kill test for the payer hypothesis and its PASS criteria (R3).
+- Kill test for the payer hypothesis and its PASS criteria, plus R3 §G's other experiments and the day-90 rule (R3).
 - Naming: `baton` is a codename and is not usable as a product name; leading candidate and
   what is still unchecked (R3 naming section).
 
