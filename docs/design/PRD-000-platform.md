@@ -1,6 +1,6 @@
 # PRD-000: Platform product requirements
 
-> Status: APPROVED v1; DRAFT v2 advisory pass (awaiting reviewer spot-check)
+> Status: APPROVED v2 (spot-checked 2026-11-26 by a different-model reviewer: 21/21 advisories closed, 0 regressions; F22-F25 ADVISORY open; see PRD-000-platform.review.md). Byte cap: the body before the Review log is capped at 40,000 B; the Review log is uncapped.
 
 ## Facts
 

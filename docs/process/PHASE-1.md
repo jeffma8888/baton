@@ -8,7 +8,7 @@
 | # | Deliverable | File | Author model | Reviewer model | Depends on | Done when |
 |---|---|---|---|---|---|---|
 | 1 | VISION v1 | `VISION.md` (replaces v0.1 in place; git keeps v0) | Fable | Opus | R1, R3, R2 verdict | DONE: APPROVED v2 2026-11-26 (A12-A15 advisory open) |
-| 2 | PRD-000 product requirements | `docs/design/PRD-000-platform.md` | GPT | Fable | VISION v1 | Reviewer APPROVE; every requirement traces to VISION v1 or a research doc; P0 / later split explicit |
+| 2 | PRD-000 product requirements | `docs/design/PRD-000-platform.md` | GPT | Fable | VISION v1 | DONE: APPROVED v2 2026-11-26 (F22-F25 advisory open) |
 | 3 | HLD-000 platform overview | `docs/design/HLD-000-platform-overview.md` | Opus | GPT | PRD-000, R2 APPROVED | Reviewer APPROVE; follows `TEMPLATE-HLD.md`; all options listed, cons tagged, verdicts from BLOCKING alone |
 
 Each deliverable follows the Review protocol in `BRIEF.md`: author writes, a different model

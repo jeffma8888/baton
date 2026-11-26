@@ -186,3 +186,67 @@ Author's mistakes found, in generic form for the corpus:
 - Using "as appropriate" inside an acceptance criterion (FR-16).
 - Carrying a research estimate labelled LOW into a Facts section without its label (line 29).
 - A preferred option and the priority of the requirement that implements it disagreeing (option set 3 and FR-20).
+
+## Spot-check (v2)
+
+> status: COMPLETE (APPROVE v2, 0 BLOCKING, 4 new ADVISORY F22-F25)
+> reviewer: Fable; date: 2026-11-25
+> file checked: docs/design/PRD-000-platform.md, 42,063 B total, body 39,203 B before `## Review log`; read in full in four line ranges (1-60, 60-100, 101-139, 140-209) plus the Review log and Sources.
+
+### Per-finding table
+
+Status values: closed / partially / declined-acceptable / declined-not-acceptable. Evidence lines are v2 line numbers.
+
+| Finding | Review log claim | Status | Evidence line(s) |
+|---|---|---|---|
+| F1 | Re-cited team API; distinguished 3b white-label API; noted VISION phrasing | closed | 131: FR-27 trace is now "VISION §The one-paragraph thesis; R1 §Analysis; R2 §Three-month scope"; title adds "not an embeddable customer-tenant API". 99: "VISION §Strategy's 'headless and white-label API last' describes the later white-label 3b surface, not the P0 team API (FR-27)". 158: Out of scope 2 keeps "FR-27 is an internal team API". The VISION wording handoff is for the lead's VISION advisory list, not for this PRD. |
+| F2 | Added R2 Analysis for executor/network rules | closed | 125: FR-21 trace "VISION §Design principles; R2 §Analysis; R3 §B". |
+| F3 | Replaced sandbox option verdict with P0 container outcome and HLD-000 default-tier decision | closed | 97: "P0 ships a hardened container executor (VISION §Design principles; FR-11). The default trust tier for lower-trust work, hardened container versus microVM, is decided in HLD-000 (VISION §Open questions item 4)." 161: Out of scope 5 "HLD-000 separately decides the default trust tier and whether a microVM is needed". 202: Handoff 3 "Choose ... default trust tier from pilot evidence". 176: Assumption 5 reworded neutrally. One residue in OQ 5, see F22. |
+| F4 | FR-20 becomes P0 if pilot selects two hosts before HLD approval | closed | 124: "FR-20 (P1; becomes P0 if option set 3 resolves to A before HLD approval)". 95: option set 3 verdict unchanged, "Pilot evidence chooses the supported pair before HLD approval". |
+| F5 | Added thin server-served web UI plus API option | closed | 84: Option C with Pros, two [ADVISORY] cons, "Why preferred if pilots need browser access", cites R3 §B and R2 §5. 85: verdict covers all three and names the P0 items to revise if B or C is selected. |
+| F6 | Moot: option set 4 A/B removed; zero-exfiltration caution shared | closed (moot) | 97: no option set remains. 147: NFR-4 "Containers share the kernel and do not guarantee hostile-code isolation" states the shared caution once. |
+| F7 | De-duplicated by cross-reference; aligned daemon socket wording | closed | 107: FR-3 "gate/check outcomes follow FR-16". 122: FR-18 "merge eligibility follows FR-16". 120: FR-16 is the single gate statement. 146: NFR-3 "ambiguous writer recovery follows FR-14". 147: NFR-4 "mount exclusions are in FR-10 and FR-11". 150: NFR-7 "hard execution limits follow FR-24 and best-effort monetary usage follows FR-25"; concurrency accept clause removed. 152: NFR-9 accept "passes FR-3". 153: NFR-10 "(FR-22/FR-23)". 115 and 147: both say "container daemon socket". No invariant is now stated twice with different wording. |
+| F8 | Stage-specific fail-closed cases | closed; now checkable | 120: "after a SHA change, the prior approval and checks become stale; missing, denied or stale approval or missing, failed or stale pre-PR required checks block PR creation; missing, failed or stale PR-triggered required checks block merge eligibility; an injected gate evaluation error blocks PR creation and merge eligibility". "as appropriate" is gone; each case names its outcome. |
+| F9 | Withdrew FR-33; threshold stays in Out of scope | closed | 137: "FR-33 withdrawn, see Review log." 158: Out of scope 2 "only after R3 §G item 4 yields at least two 3b letters of intent". Numbering preserved; 33 live FRs plus one tombstone. |
+| F10 | Three-attempt median, failure handling, non-waivable miss | closed; now checkable | 144: "across at least three documented fresh install attempts ... median time to first successful run is at most 60 minutes, counting unsuccessful attempts as over 60 minutes. A miss fails this NFR and triggers a VISION target review, not a waiver." LOW label retained. |
+| F11 | Added reachable OIDC test provider prerequisite | closed | 144: "a reachable OIDC provider with a test client" in NFR-1 prerequisites. 178: Assumption 7 "reachable OIDC test provider". |
+| F12 | Hard caps where priced usage observable; opaque unknown | closed | 129: "a configured hard cap stops new agent calls where priced adapter usage is observable; an adapter with opaque charges displays `unknown` and never claims a guaranteed dollar cap". Matches R2 §Analysis "stop new calls at supported caps". |
+| F13 | Removed retention from title; HLD-000 decides | closed | 153: title "NFR-10 (P0), audit integrity"; "Retention policy is decided in HLD-000, not claimed here". 205: Handoff 6 lists retention. |
+| F14 | Basic audit event and a known test secret | closed; now checkable | 148: "a known test secret injected into run output is absent from every corresponding basic audit event". "ordinary audit record" is gone. |
+| F15 | Kept CLI adapter; removed inbound-runner topology and named state | closed, with a note | 108: FR-4 changed from "each driven through a supported local CLI interface" to "at least one driven by a supported local agent CLI"; this is a loosening from both to one, consistent with VISION principle 6 ("one local and one container backend") and the brief's coverage item; the Review log row does not say the reach changed. 116: FR-12 topology clause removed; 202: Handoff 3 "Choose outbound runner connection topology". 118: FR-14 names no state; 146: NFR-3 follows FR-14. 145: NFR-2 stages reduced to measurement points. 147: "container daemon socket". |
+| F16 | Marked alpha timing LOW | closed | 29: "R2 estimates a 12-week alpha after approved design (estimate, LOW)." |
+| F17 | Corrected payer FAIL branch | closed | 172: "Enterprise-dependent FR-30 and Out of scope 4 require PASS; open workflow requirements stand in the re-scope branch and lapse only if work stops." Matches R3 §G item 1. |
+| F18 | Branding contingent on payer assumption | closed | 134: "in a later Enterprise release contingent on Assumption 1". |
+| F19 | Release definition split; Sources listed | closed | 57-77: twenty-one one-fact bullets. 238-243: `## Sources` lists the four approved inputs. Placement after the Review log, see F23. |
+| F20 | Made room under both byte caps | closed | Body 39,203 B before `## Review log` (measured); whole file 42,063 B, see F24. |
+| F21 | Shell-native client wording | closed | 83: "[ADVISORY] no shell-native client for scripted team use". |
+
+Tally: 21 closed (F6 moot), 0 partially, 0 declined. The three acceptance criteria graded vague in v1 (FR-16, NFR-1, NFR-5) are now checkable without interpretation.
+
+### Regression check
+
+- Traces: every re-cited section exists in the cited source and supports the requirement. FR-27 now cites R2 §Compliance posture and R3 §C (line 131). The option set 2 verdict and the option set 4 restatement cite VISION §Open questions item 4 and R2 §Open questions. No trace that was `supports` in v1 has weakened. 0 broken.
+- Coverage: all brief coverage items still present. FR-4 still requires two adapters including at least one local agent CLI (108), FR-11 keeps the container executor (115), FR-9 to FR-10 keep worktree isolation, FR-18 to FR-19 keep events and replay, FR-25 to FR-26 keep cost caps and quotas, FR-27 keeps compliance posture, FR-31 to FR-32 keep self-host and licensing. The FR-33 tombstone (137) removes a requirement that had no brief coverage item behind it. 0 dropped.
+- Priority scope: nothing hosted, embeddable, multi-org or Enterprise entered P0. FR-7, FR-8, FR-30 remain P1. FR-20 is P1 with a stated promotion rule (124) that depends on an option-set resolution, not on hosted or Enterprise scope. 0 errors.
+- Contradictions with VISION v2, R2, R3: none introduced. The option set 4 restatement (97) no longer asserts a container default and defers to HLD-000, matching VISION §Open questions item 4. Assumption 1 FAIL branch (172) matches R3 §G item 1. Alpha timing is labelled LOW (29), matching R2's own confidence label.
+- Rule 5 and form: 0 em-dashes, 0 en-dashes, 0 URLs, 0 paths, 0 handles, 0 personal names (word-bounded scan). Body before `## Review log` 39,203 B, under the 40,000 B cap. Whole file 42,063 B, see F24.
+- Result: **0 BLOCKING regressions.**
+
+### New findings
+
+- **F22 [ADVISORY] Open question 5 keeps the pre-F3 container-default framing.** Line 189: "settle whether container-default eligibility holds or a VM/new scope is needed". After F3 the body no longer asserts a container default anywhere else; this clause is the one residue and reads as if the default were already chosen. Fix: "settle the default trust tier and which job classes are eligible for each executor". Not blocking: the question still defers the decision to HLD-000 and VISION §Open questions item 4.
+- **F23 [ADVISORY] `## Sources` placed after `## Review log`.** Lines 238 and 210. BRIEF rule 3 lists Sources before the Review log, and R2 and R3 both end with Sources then Review log. Fix: move the six Sources lines above `## Review log`. Form only, no content effect.
+- **F24 [ADVISORY] Whole file exceeds the 40,000 B cap while the body is under it.** File 42,063 B; body before `## Review log` 39,203 B. The lead's instruction for this spot-check sets the cap on the body, so this passes as written. Flagged so the lead can confirm which cap governs at approval; if the whole-file cap applies, the Review log rows (210-237) are the only place to trim, which is a judgment call for the author.
+- **F25 [ADVISORY] FR-4 reach change not recorded in the Review log.** Line 108 moved from "each driven through a supported local CLI interface" to "at least one driven by a supported local agent CLI". The change is sound (VISION principle 6 asks for one local and one container backend, and the brief's coverage item is satisfied), but the Review log F15 row describes only the topology and state removals. Fix: add one clause to the F15 row stating the local-CLI requirement was narrowed from both adapters to at least one.
+
+### Final verdict
+
+**APPROVE v2.** 21 of 21 v1 findings closed (F6 moot), 0 partially, 0 declined; 0 BLOCKING regressions; 4 new ADVISORY findings (F22 to F25) that do not gate approval.
+
+### Learnings / mistakes (v2 run)
+
+- Read the file in fixed line ranges from the start; this avoided the output clipping that cost a re-read in v1.
+- Used a word-bounded regex for the personal-name scan after the v1 "metadata" false positive on a substring match.
+- Pre-numbered F22 to F24 inside the per-finding table before the New findings subsection existed; wrote them immediately after so every reference resolves. Better order next time: write the findings list first, then cite it.
+- Measured the body and whole-file sizes separately and reported both, because the brief cap and the lead's instruction cap different spans.
+- Checked for residue of removed phrasing (container default, Docker, "as appropriate", "ordinary", "inbound") across the whole body rather than only at the lines the Review log pointed to; that is how F22 surfaced.
