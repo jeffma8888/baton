@@ -59,6 +59,15 @@ Read `VISION.md` before anything else. It is a hypothesis; your job may be to br
 customize (agents, repos, sandboxes, gates, branding) and offer to its own teams or customers."
 Three candidate audiences are in VISION.md. Tell us which are real, which are not, and why.
 
+## Learnings protocol (mandatory)
+
+End every final message with a `## Learnings / mistakes` section: anything you got wrong and
+corrected during the run (a wrong fact, a dead URL you first trusted, a mislabelled option, a
+tool misuse), one line each: what, how you caught it, the rule. "None" is acceptable only if
+true. The lead appends them to `docs/process/LEARNINGS.md` and files each one, in generic
+form, to the public corpus github.com/jeffma8888/agent-failure-modes. Reviewers do the same
+for the author's mistakes they find. Nobody is graded on having none; the corpus is.
+
 ## Review protocol
 
 Each deliverable is reviewed by a DIFFERENT model than its author. The reviewer writes

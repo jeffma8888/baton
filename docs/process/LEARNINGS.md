@@ -1,0 +1,19 @@
+# Learnings log (append-only)
+
+Every mistake made on this project, by the maintainer's assistant or by any teammate model,
+is recorded here in generic form and then filed to the public corpus
+[agent-failure-modes](https://github.com/jeffma8888/agent-failure-modes) (`AFM:` column:
+`pending` → `INC-nnnn` or `extends INC-nnnn` or `skip (reason)`). Entries name roles and
+models, never people. Teammates report their own under `## Learnings / mistakes` in each
+final message; the lead appends them here.
+
+| # | Date | Who | What went wrong | How caught | Fix / rule | AFM |
+|---|---|---|---|---|---|---|
+| L1 | 2026-11-23 | lead | Project thesis ("the category-defining product shut down") written from ONE secondary news article that was accurate on its date; the vendor's primary changelog showed the shutdown was reversed 9 days later. Thesis propagated into VISION, README and the teammate brief. | R1 author under the primary-sources-only rule fetched the changelog. | A premise about a current event is checked against the primary status source at write time, with the check date recorded; secondary sources date events, they do not establish current state. | pending |
+| L2 | 2026-11-23 | R3 author (Fable), twice | Two naming candidates passed registry, handle and repo-description checks but collided with live same-category products: one visible only in a non-English README, one in a release-only repo with an empty description. | Cross-model reviewer (Opus) read the READMEs of search hits. | Naming method now reads the README of every repository-name hit whose description is empty, non-English, or a release/landing repo; "none in category" needs that evidence. | pending |
+| L3 | 2026-11-23 | R3 author (Fable) | Options analysis applied one invariant ("may not offer to customers") as BLOCKING to one licence and ADVISORY to two others with the same clause; a con common to every option ("engine does not exist yet") was labelled BLOCKING on one. | Cross-model reviewer. | State each invariant once and apply its label to every option it touches; a con shared by all options is never BLOCKING. Verdicts survived both fixes, which is the test. | pending |
+| L4 | 2026-11-23 | R3 author (Fable) | Status line self-certified "all 8 BLOCKING fixed" in the document being reviewed. | Cross-model reviewer (R-h). | The review log, written by the reviewer, is the record; an author's status line never asserts verification. | pending |
+| L5 | 2026-11-23 | lead | Reported "6 BLOCKING" after `rg -c`, which counts matching lines, not occurrences; the author's 9 was right. | Re-count with `rg -o … \| wc -l`. | Count occurrences, not lines, and state the unit in the report. | pending |
+| L6 | 2026-11-23 | lead | Case-insensitive leak-scan pattern `/Users/` matched `api.github.com/users/<name>` URLs and reported two false leaks. | Reading the hits. | Machine-path tokens are matched case-sensitively, in a separate pattern from the case-insensitive name tokens. | pending |
+| L7 | 2026-11-23 → 25 | lead | Spawned two teammates on a model that a standing memory rule marks disabled (IAM-denied), because the user named it. `agent spawn` returned "spawned successfully" and a thread id, but no turn ever ran; detected two days later by the absence of the output files. R2 and the R1 review lost two days. | File absence on the next state check. | When a user names a resource a standing rule marks unavailable, reconcile out loud before using it. After any spawn, confirm the first checkpoint artifact (the skeleton file the brief requires within the first actions) exists within minutes: a successful spawn is not a running teammate. | pending |
+| L8 | 2026-11-23 | lead | The teammate brief's rule 5 forbade personal names; the brief's own "what we know" section named a third-party company's founders. | R1 author flagged it in Handoffs. | Run a brief's own checks against the brief before issuing it. | pending |
