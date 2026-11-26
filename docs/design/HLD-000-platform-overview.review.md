@@ -317,3 +317,41 @@ Independent disk measurement: HLD **79,194 B whole file; 71,892 B before `## Rev
 - A first option-inventory script failed on regex tuple unpacking; corrected the script and independently counted all 73 alternatives and 22 tagged eliminations. Rule: validate automated inventories against the section shape before using their counts.
 - The seven UNRUN experiments still stop maintainer approval, but PRD handoff 3 permits an unresolved pilot tier in a reviewable HLD. Rule: give an independent document-quality verdict rather than relabelling an external experiment hold as a text defect.
 
+## Final check (v3)
+
+> status: COMPLETE (APPROVE); checked DRAFT v3 on disk, 2026-11-26. Historical v1 and v2 review sections remain unchanged; their older REVISE verdicts are superseded by this v3 document-quality verdict.
+
+### F21/F22 status
+
+| Finding | Status | Reopened source and current-file evidence |
+|---|---|---|
+| 21 [BLOCKING] | closed | §5 Option 7 ll628-632 now quotes PRD FR-31 l135, tags removal of mandatory Postgres BLOCKING under I7, and eliminates on con 1 alone; §5 table ll636-641 and Appendix A I7 l860 agree. Out of Scope 19 l124 assigns the possible single-user no-Postgres mode to a later HLD, consistent with R2 §Analysis/Durability l102 and PRD P0 scope ll62-64. |
+| 22 [BLOCKING] | closed | §6.2 Option 5 l673 now explains that an execution identity's candidate-branch commit becomes effective policy before human merge, contrary to PRD FR-26 l130 and FR-21 l125. It no longer claims a distinct human change gate is erased or cites R2 as proof. Table l700 eliminates on FR-26; Appendix A l864 lists FR-26 and l866 correctly says I4 eliminates no option. |
+
+### Option 4/5 tag ruling
+
+**The tags may differ: the conditions are different, not merely different implementations of the same violation.** Option 4 (§6.2 l671) reads policy only from the **protected default branch**, so the agent cannot make its own unmerged candidate edits authoritative; a human with protected-branch policy-merge authority must first accept them. Its ADVISORY con is the operational cost and risk of binding policy authority to host merge permissions rather than baton's native admin role. Option 5 (l673) explicitly makes an **unmerged agent commit** effective policy, with no human policy-merge authorisation and an execution identity that has no role (§8 l737); that is a deterministic FR-26/21 authority violation and BLOCKING.
+
+Human merge by itself is not proof of admin authorisation: a viable Option 4 must restrict policy-changing merges to appropriately authorised policy administrators (or map those protected policy-merge rights to the authorised admin function). The option does not require granting that authority to an unauthorised actor and can satisfy FR-26; such role binding belongs to its implementation/verification, not an inherent elimination. Option 5 as defined cannot meet the rule without changing its effective-policy boundary into the already viable protected-branch variant. Thus no mandatory retag or reword is needed; the requirement citation alone does not force equal tags for non-equivalent conditions.
+
+### Ripple and form verification
+
+- **Option and criterion audit:** Independently parsed the v3 body: 17 sub-decisions, 73 options, 23 distinct inline `[BLOCKING]` cons on 23 eliminated options, and 50 viable options with **zero** BLOCKING cons. Each option retains Pros, tagged Cons and a Why/Why-not verdict; every eliminated option says con 1 alone makes it infeasible. Appendix A ll851-866 enumerates **the exact same 23 section/option pairs**, including §5 Option 7 under I7 and §6.2 Option 5 under PRD FR. §5 table ll636-641 and §6.2 table l700 match; §10.1 Option 2 l797 applies I7 to the same missing-Compose condition as §5 Option 7, not to an extra compatible service. The surviving §6.2 Options 1-4 contain no BLOCKING tag.
+- **Out of Scope 19:** The no-Postgres, single-user *later* mode (§Out of Scope l124) is not offered as a P0 option and does not displace Postgres in P0 ll38-51, §2 ll217-250, §5 Option 1 ll548-550 or §10.1 l795. It is a possible future design per R2 §Analysis/Durability l102; PRD P0 scope ll62-64 and FR-31 l135 remain binding for this alpha.
+- **Trim trace, checked in the complete v3 body against the author log ll920-921 and previously opened v2:** The deleted §3.2 introductory Firecracker detail persists as §3.2 Option 2 con 1 l407, with network/secret capability boundaries in the executor-provider contract l350; the shortened P0 slice description l38 is still explicit in P0 bullets ll42-51 and Out of Scope ll110-124 (including one runner OS at item 18); removed not-a-UI prose is covered by Out of Scope 11 l116 and VISION §What it is NOT; the §11 hosted-compute/idle-cost description becomes the cross-reference at l845 to §3.2 ll387,413; omitted §11 import-tool sentence remains Out of Scope 17 l122; shortened References preface l870 still keys R1/R2/R3 sources at ll872-880. The trims drop no architecture option, PRD requirement trace, source key, exclusion or decision boundary.
+- **Byte/form and approval boundary:** Independently counted **81,188 B whole HLD, 71,969 B before `## Review log`**, leaving **31 B** under the permitted 72,000 B body cap; 22 dated Review log rows. No em dashes or raw URLs. The VISION/PRD/R2/R3 citation keys, invariant labels, workflow and section structure remain; no Rule 5 operator identity or internal URL/system observed. P0 experiment rows ll55-66 still mark all seven R3 §G studies UNRUN, and Action Item 1 l884 assigns them to the maintainer before actual HLD approval. This is an approval hold, **not** a document-quality finding.
+
+### New findings
+
+None. No finding numbered 23+ is warranted; F21 and F22 are closed on the actual v3 text. Option 4's implementation must preserve admin-equivalent policy authority, as stated in the tag ruling, but that is not a violated invariant in the option as defined.
+
+### Final verdict
+
+**APPROVE** on v3 document quality. The seven UNRUN R3 §G experiments remain a separate maintainer-owned hold on actual HLD approval.
+
+### Learnings / mistakes (v3)
+
+- A matching FR-26 citation did not mean Options 4 and 5 shared the same authority violation: I compared protected-branch human merge with automatic unmerged candidate-policy activation and kept distinct ADVISORY/BLOCKING tags. Rule: tag the actual condition, not the requirement number alone.
+- The 72,000 B limit left only 31 B, so I checked each described trim against surviving scope, options, cost and exclusion passages instead of trusting a size count alone. Rule: budget compliance must not erase a requirement or decision.
+- The earlier v2 review's body length and BLOCKING total became stale when v3 added one tag. Rule: preserve historical verdicts while independently recounting the current candidate and append a superseding final verdict.
+

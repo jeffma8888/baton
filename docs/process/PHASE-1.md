@@ -1,6 +1,6 @@
 # Phase 1 — from research to an approved platform design
 
-> Status: STARTED 2026-11-25. Inputs: R1 APPROVED v2, R2 APPROVED v2 (2026-11-25), R3 APPROVED v4.
+> Status: COMPLETE 2026-11-26 on document quality (all three rows approved); the R3 §G experiment hold on HLD-000 stands until the maintainer records results. Started 2026-11-25. Inputs: R1 APPROVED v2, R2 APPROVED v2 (2026-11-25), R3 APPROVED v4.
 > Open advisory findings on R1 (F13) and R2 (F13-F15) are listed in each doc's status line.
 
 ## Deliverables, in order
@@ -9,7 +9,7 @@
 |---|---|---|---|---|---|---|
 | 1 | VISION v1 | `VISION.md` (replaces v0.1 in place; git keeps v0) | Fable | Opus | R1, R3, R2 verdict | DONE: APPROVED v2 2026-11-26 (A12-A15 advisory open) |
 | 2 | PRD-000 product requirements | `docs/design/PRD-000-platform.md` | GPT | Fable | VISION v1 | DONE: APPROVED v2 2026-11-26 (F22-F25 advisory open) |
-| 3 | HLD-000 platform overview | `docs/design/HLD-000-platform-overview.md` | Opus | GPT | PRD-000, R2 APPROVED | Reviewer APPROVE; follows `TEMPLATE-HLD.md`; all options listed, cons tagged, verdicts from BLOCKING alone |
+| 3 | HLD-000 platform overview | `docs/design/HLD-000-platform-overview.md` | Opus | GPT | PRD-000, R2 APPROVED | DONE: APPROVED v3 on document quality 2026-11-26 (3 review cycles, 22 findings closed); §G experiment HOLD stands |
 
 Each deliverable follows the Review protocol in `BRIEF.md`: author writes, a different model
 reviews into `<doc>.review.md`, author revises with a `## Review log`, reviewer re-verifies,

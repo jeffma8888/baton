@@ -1,6 +1,6 @@
 # HLD-000 Platform overview HLD
 
-> Status: DRAFT v3 (two findings fixed after re-verification, awaiting final check)
+> Status: APPROVED v3 on document quality (final check 2026-11-26 by a different-model reviewer: findings 1-22 closed, no new findings; see HLD-000-platform-overview.review.md). HOLD: the seven R3 §G experiments are UNRUN; the maintainer lifts this hold by recording their results in the Action Items. Implementation plans may be drafted against this HLD but no code is written while the hold stands.
 > HLD = architecture decisions, system boundaries, options analysis, data flows.
 > No class names, config keys, or test file names (those belong in the LLD).
 > Every decision cites its source (research doc §, measurement, or "verified-by: <how>").
