@@ -1,21 +1,21 @@
 # PLAN-000 Platform alpha implementation plan
 
-> Status: DRAFT v2 (re-verified 2026-11-27: REVISE; F2, F9 partly closed, F19 blocking; see the review file). HOLD inherited from HLD-000: the seven R3 §G experiments are UNRUN; no CODE story may start until the maintainer lifts that hold. Drafted under the HLD's "plans may be drafted" clause.
+> Status: DRAFT v3 (revised 2026-11-27 after re-verification of v2; awaiting the reviewer's final check). HOLD inherited from HLD-000: the seven R3 §G experiments are UNRUN; no CODE, TEST or OPS story may start until the maintainer lifts that hold. Drafted under the HLD's "plans may be drafted" clause.
 
 ## Source design docs
 
-Statuses are quoted from each file as read on 2026-11-27. If one changes, this plan is re-checked before use.
+Each file's status is quoted as read on 2026-11-27. If one changes, this plan is re-checked before use.
 
 | Doc | Status and version |
 |---|---|
 | `docs/design/HLD-000-platform-overview.md` | "APPROVED v3 on document quality"; "HOLD: the seven R3 §G experiments are UNRUN"; "Implementation plans may be drafted against this HLD but no code is written while the hold stands." |
 | `docs/design/PRD-000-platform.md` | "APPROVED v2"; "F22-F25 ADVISORY open" |
-| VISION, R1, R2, R3 | "VISION APPROVED v2; PRD-000 APPROVED v2; R2 APPROVED v2; R3 APPROVED v4; R1 APPROVED v2" (HLD Inputs line); not re-read here, reached only through HLD and PRD citations |
+| VISION, R1, R2, R3 | "VISION APPROVED v2; PRD-000 APPROVED v2; R2 APPROVED v2; R3 APPROVED v4; R1 APPROVED v2" (HLD Inputs line); not re-read, reached only through HLD and PRD citations |
 | `docs/design/TEMPLATE-HLD.md`, `docs/design/TEMPLATE-LLD.md`, `docs/plans/README.md`, `docs/process/BRIEF.md` | Process files, unversioned |
 
 `docs/plans/README.md` says "No plan is written before its HLD is approved." This draft relies on the drafting clause quoted above and cannot be approved for execution while the HOLD stands.
 
-**HLD decisions this plan relies on.** Quoted in HLD-000's words; the bracket is the HLD section. In this plan a bare § is an HLD-000 Design section, I1 to I12 are its invariants, and FR/NFR ids are PRD-000's.
+**HLD decisions this plan relies on.** In HLD-000's words; the bracket is the HLD section. In this plan a bare § is an HLD-000 section, I1 to I12 are its invariants, and FR/NFR ids are PRD-000's.
 
 - **D1 [§2 Option 1, Preferred]** "B inside C, a baton team server and baton runners behind provider-neutral contracts"; reversible under Action Item 2 (Risk 2).
 - **D2 [P0 Scope; §10.1 Option 1]** "One product binary in server or runner mode; one Compose file deploys server, Postgres and one runner; more runners join from other hosts".
@@ -38,7 +38,7 @@ Statuses are quoted from each file as read on 2026-11-27. If one changes, this p
 
 ## Gates before code
 
-HLD-000 Action Items 1 to 12. They are owned as the HLD states and are not agent stories; a story cites one as `AI-<n>`. "Closed" means the result is recorded in HLD-000's Action Items by the maintainer.
+HLD-000 Action Items 1 to 12. Owned as the HLD states, they are not agent stories; a story cites one as `AI-<n>`. "Closed" means the result is recorded in HLD-000's Action Items by the maintainer.
 
 | Gate | Owner (HLD) | Subject (HLD, verbatim) | HLD "Blocks" (verbatim) | Blocks in this plan |
 |---|---|---|---|---|
@@ -66,7 +66,7 @@ Scope is P0 of the 12-week self-hosted alpha. The first milestone with code, M1,
 | # | Milestone | Stories | Estimate | Exit test (one person, one sitting) |
 |---|---|---|---|---|
 | M0 | Design and decisions (no code) | 17 | under HOLD | Every document from S0.1 to S0.17 has a status line reading APPROVED and an APPROVE verdict from a different model in its `.review.md`. |
-| M1 | Walking skeleton | 26 | 3 weeks | After one Compose command, a member of a registered test repo with branch protection on uses the CLI over TLS to create a task and start a run (first adapter, `trusted-local` allowed by policy); a reviewer of that repo approves the candidate SHA through the API, and a user without the reviewer role is refused; exactly one PR holding the agent's commit appears on the host. Not deployable outside a development host (Risk 8). |
+| M1 | Walking skeleton | 26 | 3 weeks | After one Compose command, a member of a registered test repo with branch protection on uses the CLI over TLS to create a task and start a run (first adapter, `trusted-local` allowed by policy); a distinct reviewer of that repo approves the candidate SHA through the API, and a user without the reviewer role is refused; exactly one PR holding the agent's commit appears on the host. Not deployable outside a development host (Risk 8). |
 | M2 | Durable run lifecycle and recovery | 17 | 2 weeks | Kill the runner mid-run, restart the server and deliver a claim twice: one run record remains and the run resumes under a new epoch or shows NeedsReconciliation; a cancel ends Cancelled; a run past its time limit ends TimedOut. |
 | M3 | Policy, gates, audit and roles | 22 | 2.5 weeks | Add a commit to an approved candidate: approval and checks read stale, and if the PR was not yet open none opens. An injected evaluation error blocks PR creation and merge eligibility. A runner credential is refused on approve. With the audit write forced to fail the gate stays ineligible. The audit query reconstructs a completed run. |
 | M4 | Container tier and second adapter | 14 | 1.5 weeks | Both agents complete a run (to Candidate, diff readable) on both tiers; inside a container run the host checkout, host agent credential and daemon socket are absent; an undeclared capability shows unavailable or denied. |
@@ -75,7 +75,7 @@ Scope is P0 of the 12-week self-hosted alpha. The first milestone with code, M1,
 
 ## Stories
 
-Conventions, stated once:
+Conventions:
 
 - **Type.** DOC (one document), CODE (one behaviour, red then green: a failing test for the acceptance line first, then the change that passes it), TEST (one scenario suite), OPS (build, deployment or evidence artefact).
 - **DOC-OK** means: written in `docs/design/TEMPLATE-LLD.md` format, every item traced to an HLD-000 section, Option / Pros / Cons with `[BLOCKING]` or `[ADVISORY]` wherever more than one implementation is viable, reviewed by a different model with verdict APPROVE in `<doc>.review.md`, a Review log row appended, status line APPROVED. "decides" marks a choice HLD-000 leaves open.
@@ -128,13 +128,13 @@ M1 defers breadth, not invariants. Deferred: role and policy administration (S0.
 | S1.12 | Runner registers outbound | CODE | FR-12; §3.3 | The runner authenticates outbound and registers platform, executors, adapters and labels; its host listens on no inbound port; tests pass | S0.6, S1.3 | AI-1 |
 | S1.13 | Per-run read-only clone credential | CODE | NFR-5; §7.2 | The server issues a per-run credential that can clone the repo; the host refuses a push made with it; tests pass | S1.7 | AI-1 |
 | S1.14 | Agent API key as a secret reference | CODE | FR-6, NFR-5; §4, §8 | An agent key is stored as a secret reference per org or repo; its value appears in no API read; tests pass | S1.7 | AI-1 |
-| S1.15 | Leased claim with fencing epoch | CODE | FR-12, FR-14; §3.3, §5 | A registered runner eligible under S0.6's rule (platform, executors, adapters, labels) claims the Queued run and receives run spec, fencing epoch, a lease with S0.6's expiry and per-run credentials; state Claimed; a second claim on it fails; with no runner connected, or only an ineligible one, the run stays Queued; tests pass | S1.11, S1.12, S1.13, S1.14 | AI-1 |
+| S1.15 | Leased claim with fencing epoch | CODE | FR-12, FR-14; §3.3, §5 | A registered runner eligible under S0.6's rule (platform, executors, adapters, labels) claims the Queued run and receives run spec, fencing epoch, a lease and per-run credentials with S0.6's expiry; state Claimed; a second claim on it fails; with no runner connected, or only an ineligible one, the run stays Queued; tests pass | S1.11, S1.12, S1.13, S1.14 | AI-1 |
 | S1.16 | Worktree executor prepares the checkout | CODE | FR-9, FR-10; §3.1 | Through the executor-provider contract the run gets a fresh worktree and branch from a runner-owned mirror; states Preparing, Running; the run reads `trusted-local`; tests pass | S0.7, S1.15 | AI-1 |
 | S1.17 | First agent adapter | CODE | FR-4, FR-6; §4 | The first agent of the selected pair starts in the run's executor with a per-run scoped key and no consumer login; its output maps to normalized events matching golden fixtures; tests pass | S0.8, S1.16 | AI-1, AI-4 |
 | S1.18 | Ordered event ingest | CODE | FR-2, FR-14; §3.3, §5 | The runner sends events with sequence numbers under its fencing epoch; a resent number is stored once; stored order equals sent order; an event under any epoch but the run's current one, or sent after the lease expired, is refused; tests pass | S1.15 | AI-1 |
 | S1.19 | Run events from a cursor (API) | CODE | FR-2, FR-27, NFR-6; §4, §8 | A second member of the repo reads run state and events in order from a cursor; a user outside its membership is refused; tests pass | S1.18 | AI-1 |
 | S1.20 | CLI starts a run | CODE | FR-2, FR-28 | The CLI starts a run with a named agent and executor and shows state and events equal to API reads; tests pass | S1.9, S1.19 | AI-1 |
-| S1.21 | Candidate commit capture | CODE | FR-14, FR-15; §3.3, §7.2 | When the agent finishes, the runner commits outside the agent's control and uploads commits and diff; a later write by the agent process does not alter them; an upload under a stale epoch is refused; tests pass | S1.17, S1.18 | AI-1 |
+| S1.21 | Candidate commit capture | CODE | FR-14, FR-15; §3.3, §7.2 | When the agent finishes, the runner commits outside the agent's control and uploads commits and diff; a later write by the agent process does not alter them; an upload under a stale epoch or expired lease is refused; tests pass | S1.17, S1.18 | AI-1 |
 | S1.22 | Server pushes the candidate branch | CODE | FR-15; §5, §7.2 | An outbox worker pushes the uploaded commits with the server's Git-host identity and records the SHA; state Candidate; running the worker twice leaves one branch at that SHA; tests pass | S1.21 | AI-1 |
 | S1.23 | Candidate diff read (API) | CODE | FR-15, FR-27 | The API returns proposed files, diff and recorded SHA; the SHA equals the branch head on the host; tests pass | S1.22 | AI-1 |
 | S1.24 | Approval bound to the candidate SHA | CODE | FR-16, FR-17, FR-26; §6.1, §8, I4, I9 | With a fixture policy naming no required pre-PR check the run passes Checks and waits in Review; a policy naming one stays ineligible (no check runs before M3); a reviewer's approval is stored against the SHA with its audit event in one transaction; a non-reviewer, a user outside the repo's membership, one S0.9 rules not distinct and a runner credential are each denied on approve; tests pass | S1.23 | AI-1 |
@@ -169,7 +169,7 @@ M1 defers breadth, not invariants. Deferred: role and policy administration (S0.
 |---|---|---|---|---|---|---|
 | S3.1 | Install token binds the first admin | CODE | FR-26; §8 | The one-time install token makes the first signed-in user org admin; a second use is refused; tests pass | S1.6 | AI-1 |
 | S3.2 | Role checks on API operations | CODE | FR-26, FR-34; §8 | A user without the org admin role cannot change policy and one without the reviewer role cannot approve; an org admin can change policy; a reviewer can decide a gate; every other operation follows S0.4's role table; tests pass | S3.1 | AI-1 |
-| S3.3 | Repo-membership scoping of reads | CODE | NFR-6; §8 | A user outside a repo's membership cannot read its tasks, runs or audit records by API or CLI while another team's reads succeed; tests pass | S3.2 | AI-1 |
+| S3.3 | Repo-membership scoping of reads | CODE | NFR-6; §8 | A user outside a repo's membership cannot read its tasks, runs or audit records by API or CLI while another team's reads succeed; tests pass | S0.5, S3.2 | AI-1 |
 | S3.4 | Runner credential operation limit | CODE | FR-17, FR-26, NFR-5; §3.3, I4 | A runner credential succeeds only on S0.6's operation list and is denied on admin, approve and merge calls; tests pass | S0.6, S3.2 | AI-1 |
 | S3.5 | Versioned policy document | CODE | FR-21, FR-23; §6.2 | An org admin stores a policy document covering every §6.2 rule category; an invalid one is refused; each version is hashed and the hash is recorded with every decision; tests pass | S1.10, S3.2 | AI-1 |
 | S3.6 | Per-repo policy overrides | CODE | FR-21; §6.2 | A tightening override is accepted; a loosening one needs an org admin; deny wins; two repos with different policies give the same proposed run different recorded outcomes; tests pass | S3.5 | AI-1 |
@@ -204,7 +204,7 @@ Until AI-3 closes, every container-tier run in M4 uses a controlled fixture repo
 | S4.6 | Container tier as the repo default (conditional) | CODE | FR-11; §3.2 | CONDITIONAL on the pilot threat review confirming §3.2 Option 1: a repo with no tier rule runs on the hardened container tier and `trusted-local` needs a per-repo org-admin opt-in; tests pass | S4.5 | AI-1, AI-3, AI-12 |
 | S4.7 | Pre-PR checks in a fresh container | CODE | FR-16; §6.1 | For a container-tier run the required checks execute at the candidate SHA in a new container; tests pass | S3.11, S4.2 | AI-1 |
 | S4.8 | Isolation test | TEST | NFR-4, FR-10, FR-11 | On the supported runner, inside a sandbox-required run the host checkout, host agent credential and container daemon socket are absent, and the FR-10 policy denial holds; tests pass | S4.3, S4.5 | AI-1 |
-| S4.9 | Capability declaration at registration | CODE | FR-5; §4 | Each adapter declares versioned capabilities; a feature the agent lacks shows unavailable before dispatch in API and CLI; tests pass | S1.17 | AI-1 |
+| S4.9 | Capability declaration at registration | CODE | FR-5; §4 | Each adapter declares versioned capabilities; a feature the agent lacks shows unavailable before dispatch in API and CLI; tests pass | S0.5, S1.17 | AI-1 |
 | S4.10 | Undeclared capability requests denied | CODE | FR-5; §4 | A resume, steering or approval request the adapter did not declare is denied and audited, never reported as successful; tests pass | S4.9 | AI-1 |
 | S4.11 | Tool-permission requests | CODE | FR-5, FR-13, FR-22, FR-23; §1 steps 6 and 7, §4, I9 | A permission request puts the run in AwaitingInput; policy or a member decides it; decision, state change, audit event and the answer for the runner commit in one transaction before the answer is delivered, and the run returns to Running; S3.9's query returns the decision, which leaves the change gate pending; with policy evaluation unavailable or the audit write rejected the tool is not granted; from AwaitingInput a confirmed stop ends Cancelled (cancel) or TimedOut (time limit), and an unconfirmed stop shows NeedsReconciliation by the path S0.2 specifies, never a completed stop; tests pass | S2.7, S2.9, S3.7, S3.9, S4.9 | AI-1 |
 | S4.12 | Second agent adapter | CODE | FR-4, FR-6; §4 | The second agent of the selected pair starts in the run's executor on a permitted API-key or enterprise path with no consumer login; its events match golden fixtures; tests pass | S0.8, S4.9 | AI-1, AI-4 |
@@ -242,17 +242,17 @@ Until AI-3 closes, every container-tier run in M4 uses a controlled fixture repo
 | S6.3 | Restore from backup | CODE | NFR-8; §5, §11 | A restore into a test environment returns runs, policies, audit and artifacts to the backup point and writes an audit event for the restore; tests pass | S6.2 | AI-1 |
 | S6.4 | Upgrade under a write freeze | CODE | NFR-8; §10.2 | Upgrade offers a dry-run; it freezes writes and claims, then takes that upgrade's own backup and does not proceed without it; it migrates only on the explicit operator step; writes and claims stay refused until the operator accepts the new version or rolls back; tests pass | S1.4, S6.3 | AI-1 |
 | S6.5 | Previous runner version accepted | CODE | NFR-8; §3.3, §10.2 | The previous release's runner build, unmodified (S0.14's compatibility artefact), registers and completes a run against the upgraded server; runs from before the upgrade stay readable; tests pass | S6.4 | AI-1 |
-| S6.6 | Upgrade drill | TEST | NFR-8 | Upgrade a populated instance: a write and a claim attempted during the freeze are refused; a prior run and gate decision verify; a rollback restores that upgrade's own backup in a test environment, and the last audit event and run state committed before the freeze are present; tests pass | S6.5 | AI-1 |
+| S6.6 | Upgrade drill | TEST | NFR-8 | Upgrade a populated instance: a write and a claim attempted during the freeze are refused; a prior run and gate decision verify; a rollback restores that upgrade's own backup in a test environment, and every audit event and the last run state committed before the freeze are present; tests pass | S6.5 | AI-1 |
 | S6.7 | Core-only build check | OPS | NFR-9, FR-3; §9.2, I2 | The release build contains no Enterprise module and fails if core code imports one; S1.1's licence check passes on the release artefact | S0.12, S1.1 | AI-1 |
 | S6.8 | Install guide | DOC | FR-31, NFR-1; §10.1, §11 | States the NFR-1 prerequisites, the single Compose command, runner join, backup, upgrade and restore, the §11 tier table and the heartbeat fields; claims no 1.0, HA, air-gap, Enterprise readiness, hostile-code isolation or zero exfiltration; a different model following only the guide reaches a first run and records APPROVE | S5.14, S6.1, S6.4 | none |
 | S6.9 | Team API reference | DOC | FR-27; §2 | Every operation S3.21 uses is documented; a different model re-creates S3.21's client from the reference alone and records APPROVE | S3.21 | none |
 | S6.10 | Install benchmark protocol | DOC | NFR-1; §10.1 | A protocol and record sheet for at least three fresh installs from the NFR-1 prerequisites: each stage and failure recorded, median time to first successful run, a failed attempt counted as over 60 minutes; a different model records APPROVE | S6.8 | none |
-| S6.11 | Clean-install release test | TEST | FR-3, FR-19, FR-28, FR-31, NFR-7, NFR-9 | On a reference host holding only the NFR-1 prerequisites, with no Enterprise licence, paid sandbox account or workflow cluster, the guide's Compose command then the FR-3 scenario passes on a pilot repo on the host, on a tier the recorded AI-3 result makes that repo eligible for; CLI results, read over TLS, equal API reads; tests pass | S2.8, S3.19, S4.14, S6.7, S6.8 | AI-1, AI-3, AI-12 |
-| S6.12 | Alpha evidence report | OPS | NFR-1, NFR-2 | One report holds the benchmark results the AI-6 owner measured with S6.10 and S5.13 on the pilot repos the AI-6 owner names, and the pilot tier from AI-3; NFR-1 reads PASS only at a median of at most 60 minutes, and a miss reads FAIL with a VISION target review, not a waiver | S5.13, S6.10, S6.11 | AI-1, AI-3, AI-6 |
+| S6.11 | Clean-install release test | TEST | FR-3, FR-19, FR-28, FR-31, NFR-7, NFR-9 | On a clean reference host holding only the NFR-1 prerequisites, with no Enterprise licence, paid sandbox account or workflow cluster, the guide's Compose command then the FR-3 scenario passes on a pilot repo on the host, on a tier the recorded AI-3 result makes that repo eligible for; CLI results, read over TLS, equal API reads; tests pass | S2.8, S3.19, S4.14, S6.7, S6.8 | AI-1, AI-3, AI-12 |
+| S6.12 | Alpha evidence report | OPS | NFR-1, NFR-2 | One report holds the benchmark results the AI-6 owner measured with S6.10 and S5.13 on representative pilot repos, and the pilot tier from AI-3; NFR-1 reads PASS only at a median of at most 60 minutes, and a miss reads FAIL with a VISION target review, not a waiver | S5.13, S6.10, S6.11 | AI-1, AI-3, AI-6 |
 
 ## Verification strategy
 
-**Test levels.** Which doubles or live accounts each level uses is S0.17's decision.
+**Test levels.** S0.17 decides each level's doubles or live accounts.
 
 1. Story level: red then green on every CODE story, both shown to the reviewer.
 2. Contract level: golden event fixtures per adapter (S0.8), the host-contract suite (S0.10), the executor-provider contract (S0.7) and the runner protocol (S0.6), each run against every implementation.
@@ -345,6 +345,7 @@ Plan-level only. HLD-000's product risks are not restated.
 | Date | Reviewer (model) | Verdict | Summary of changes requested |
 |---|---|---|---|
 | 2026-11-27 | GPT-class reviewer | REVISE | Review 1, of DRAFT v1: 18 findings (15 BLOCKING, 3 ADVISORY). Invariants deferred past the first PR (authorised reviewer, gate current at the SHA, audit with each transition, fenced lease, TLS); tier eligibility ahead of the pilot decision; credential paths; upgrade rollback; missing specification dependencies; release evidence; literal quotation and traceability. Dispositions are in the table below; the reviewer re-verifies each. |
+| 2026-11-27 | GPT-class reviewer | REVISE | Re-verification of DRAFT v2: three items remain open. F2: candidate upload is not refused under an expired lease. F9: S4.9 has no path to S0.5, the CLI LLD. New F19 [BLOCKING], introduced by v2: S6.12 no longer requires representative pilot repos. Dispositions are in the third table below; the reviewer re-checks each. |
 
 Review 1 dispositions (DRAFT v2). No story id was added, removed or renumbered: 125 stories before and after. S2.2 keeps its id and is retitled "Stale-epoch terminal status rejected". No finding was rebutted.
 
@@ -370,3 +371,19 @@ Review 1 dispositions (DRAFT v2). No story id was added, removed or renumbered: 
 | F18 | BLOCKING | changed | S0.14, S6.5 | S6.5 runs the previous release's unmodified runner build against the upgraded server and keeps the old-run read assertion; S0.14 describes that compatibility artefact. |
 
 Also changed from the review's check tables, outside a numbered finding: S0.12 (compiled-in P0 providers, with out-of-process extensions only on runners or as separate services), S2.14 (reads "a user S0.4 authorises"), the Verification M5 row (adds the S5.1 and S5.4 tests) and the Verification fault-level line (now cites S2.13, S2.17, S3.7, S3.15 and S3.20, the stories that hold the injected cases it lists). Prose was shortened to keep the body under its byte limit: the sources table lost its "Used for" column, several decision quotations became shorter exact spans, and the estimates and review paragraphs were tightened. No acceptance criterion was removed.
+
+Re-verification dispositions (DRAFT v3). No story id was added, removed or renumbered: 125 stories before and after. No finding was rebutted.
+
+| Finding | Tag | Disposition (changed / rebutted) | Where | What changed, in one line |
+|---|---|---|---|---|
+| F2 | BLOCKING | changed | S1.15, S1.21 | S1.21 refuses an upload under a stale epoch or expired lease; S1.15's claim grants a lease and per-run credentials with S0.6's expiry. |
+| F9 | BLOCKING | changed | Deps of S4.9 and S3.3 | S4.9 gains S0.5: its acceptance promises behaviour "in API and CLI". S3.3 gains S0.5 for the same cause, found by the lead's probe and not yet ruled on by the reviewer: its acceptance says "by API or CLI", and through S3.2, S3.1 and S1.6 it reached neither S0.5 nor a story that implements a CLI read (S1.9, S1.20, S2.8, S3.19), so the edge goes to the document. S3.21 and S4.13 contain the word CLI but promise no behaviour of this product's CLI and are unchanged. |
+| F19 | BLOCKING | changed | S6.12 | The report's results are measured "on representative pilot repos", the words of PRD NFR-2, in place of "on the pilot repos the AI-6 owner names". |
+
+Also changed in v3, outside a numbered finding. The author re-read every acceptance cell changed in v2 against the PRD Accept line or HLD line it traces to, looking for F19's cause (a source qualifier that v2 replaced or narrowed), and restored three, for the reviewer to rule on:
+
+- S6.11 reads "On a clean reference host holding only the NFR-1 prerequisites". v2 had dropped "clean" (PRD NFR-9: "a clean Compose installation"; FR-3: "a fresh unlicensed installation"); the M6 exit test had kept it.
+- S6.6 reads "every audit event and the last run state committed before the freeze are present". v1 read "no audit event committed before the freeze is lost" and v2 narrowed it to "the last audit event and run state" (HLD §10.2: "a rollback restore loses no committed write, audit included").
+- The M1 exit test reads "a distinct reviewer of that repo approves". v1 read "a second signed-in user approves"; v2 named the role and dropped the distinctness (HLD §1 step 10: "A distinct authorised reviewer").
+
+The status line's "no CODE story may start" now reads "no CODE, TEST or OPS story may start", matching the Blocked convention. Prose was shortened to stay under the byte limit, touching no acceptance criterion, gate, condition or quoted source span: the sources intro ("Each file's status is quoted"), the VISION row ("not re-read"), the decisions intro ("In HLD-000's words"; "an HLD-000 section"), the gates intro ("Owned as the HLD states"), the conventions heading and the test-levels sentence.
