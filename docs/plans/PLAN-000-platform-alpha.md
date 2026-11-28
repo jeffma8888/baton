@@ -1,6 +1,6 @@
 # PLAN-000 Platform alpha implementation plan
 
-> Status: DRAFT v2 (revised 2026-11-27 after review 1; awaiting re-verification by the reviewer). HOLD inherited from HLD-000: the seven R3 §G experiments are UNRUN; no CODE story may start until the maintainer lifts that hold. Drafted under the HLD's "plans may be drafted" clause.
+> Status: DRAFT v2 (re-verified 2026-11-27: REVISE; F2, F9 partly closed, F19 blocking; see the review file). HOLD inherited from HLD-000: the seven R3 §G experiments are UNRUN; no CODE story may start until the maintainer lifts that hold. Drafted under the HLD's "plans may be drafted" clause.
 
 ## Source design docs
 

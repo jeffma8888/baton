@@ -251,3 +251,220 @@ Script joined P68–74 with P265–271 by milestone, and enumerated H198–211. 
 - A graph pass initially showed every CODE story reached some DOC. Checking the relevant document instead exposed missing paths such as S3.4→S0.6; reachability to any DOC is not specification coverage.
 - The hygiene-table insertion emitted a Python invalid-escape warning for a Markdown pipe. I verified the saved text and used raw strings or literal shell input for such snippets thereafter.
 - My first evidence pass found punctuation added inside several quotation marks. I moved it outside and checked exact source spans; a faithful fragment must match the source bytes, not just its meaning.
+
+## Re-verification of DRAFT v2 (2026-11-27)
+
+### Verdict on v2
+
+**REVISE (HIGH confidence: exact source, graph and byte checks).** Of F1–F18, 16 are CLOSED, F2 and F9 are PARTLY, and none is NOT CLOSED; new F19 is BLOCKING. The verdict follows from BLOCKING items alone: M1 candidate upload lacks lease-expiry refusal, one CODE story misses its specifying CLI document, and release NFR-2 evidence no longer requires representative pilot repos. The revised reviewer/SHA/audit contracts are sufficient on M1's own path; its remaining fencing gap does not require renewal or a later milestone. The byte-neutral F2/F9 corrections and byte-saving F19 correction fit the cap; with the recommended status below the body is 59,952 bytes. The HOLD and maintainer-owned decisions remain intact, and neither this review nor a future plan-quality APPROVE authorizes code. **Exact recommended status line:** `> Status: DRAFT v2 — REVISE (re-verified 2026-11-27; F2/F9 PARTLY; F19 BLOCKING open). HOLD inherited from HLD-000: the seven R3 §G experiments are UNRUN; no CODE, TEST or OPS story may start until the maintainer lifts that hold. Drafted under the HLD's "plans may be drafted" clause.`
+
+### Findings F1 to F18
+
+V denotes the DRAFT v2 plan; H and R denote HLD-000 and PRD-000, with the same source line numbering as review 1. Historic P citations above remain v1 citations. Closure is checked against the source requirement, not the author's disposition label or my preferred wording.
+
+| Finding | Tag | Result (CLOSED / PARTLY / NOT CLOSED) | Evidence in v2 (line number and exact quote) | Source line it now satisfies | What remains, if anything |
+|---|---|---|---|---|---|
+| F1 | BLOCKING | CLOSED | V83: “signed-in users holding that role with membership of the repo”; V141: “the outbox worker opens one PR only if, at that moment, a reviewer's approval is still current at the candidate head SHA”; V140: “a policy naming one stays ineligible (no check runs before M3)”; V185: “an injected evaluation error blocks it” | H207–208 (authorised reviewer and current-SHA gate), H739 (repo scoping), R120 (both evaluation-error phases). | S0.4's fixture roles plus the M1 negative tests suffice; S1.26 need not reach S3.2 or S3.11, since role administration and running nonempty pre-PR checks are not M1's claimed behavior. V69/V142 keep branch protection active; S3.12/S3.16 own the later full gate cases. |
+| F2 | BLOCKING | PARTLY | V131: “only an ineligible one, the run stays Queued”; V134: “or sent after the lease expired, is refused”; V137: “an upload under a stale epoch is refused”; V113: “until S2.1 an M1 run fits one lease interval” | H200 (eligible fenced claim), H441 (fencing and credential expiry with lease), H583 (no second ambiguous writer). | Eligibility, second-claim refusal and event fencing are closed, and deferring renewal for a bounded M1 fixture is sufficient. Candidate-upload expiry is not tested: expiry and an old epoch are distinct (V134 itself tests both), and a slow or interrupted run can outlive its lease even without a second claim. S2.3 postpones credential-expiry refusal to M2. Smallest fix: V137 replace `stale epoch` with `stale epoch or expired lease` (+17 bytes); V131 reorder `a lease with S0.6's expiry and per-run credentials` to `a lease and per-run credentials with S0.6's expiry` (0 bytes) so the claim grants lease-bound credentials. Equal safe trim at V18: replace `Quoted in HLD-000's words; ` with `HLD-000's words; ` (−10 bytes) and `a bare § is an HLD-000 Design section` with `a bare § is an HLD-000 section` (−7 bytes). Net 0; body remains 59,958 bytes. |
+| F3 | BLOCKING | CLOSED | V141: “The gate decision, its audit event and the PR outbox entry commit in one transaction before any host call”; V185: “the transition commits only with its audit event”; V209: “decision, state change, audit event and the answer for the runner commit in one transaction before the answer is delivered”; V209: “with policy evaluation unavailable or the audit write rejected the tool is not granted” | H157 (audit before privilege), H550 (transaction and outbox), R126–127 (denied grants and complete audit). | The M1 PR transition has its own atomic audit contract, without a later-milestone dependency. S3.20 tests failed audit at approval, PR and merge eligibility; S4.11 adds permission decisions to S3.9's query. Host I/O remains outside the transaction. |
+| F4 | BLOCKING | CLOSED | V94: “resolving against §1 step 7, with no new state, the path an unconfirmed stop takes from AwaitingInput”; V209: “an unconfirmed stop shows NeedsReconciliation by the path S0.2 specifies, never a completed stop”; V209: “the run returns to Running” | H204 (unconfirmed stop), H559/H573–576 (state paths), R117 (observable unresolved cancellation). | No remaining condition. S0.2 owns resolving the diagram/detail ambiguity before code; S0.6 specifies stop confirmation. |
+| F5 | BLOCKING | CLOSED | V203: “ineligible or unknown work is denied, never moved to another tier”; V212: “On a controlled fixture repo”; V250: “on a tier the recorded AI-3 result makes that repo eligible for”; V250 Blocked: “AI-1, AI-3, AI-12” | H391 (bounded envelope; hostile code refused), H886 (pilot eligibility), H138 (strict no-egress). | S4.14 need not carry AI-3 or AI-12: V195 explicitly confines pre-decision container runs to controlled fixture repos, S0.7/S0.9 specify affirmative eligibility, and S6.11 carries both pilot gates. V335 sends an invalidated tier/egress assumption to re-planning rather than substitution. |
+| F6 | BLOCKING | CLOSED | V100: “records how each selected adapter meets FR-6's API-key and enterprise-billing path support”; V211: “each adapter's credential-path support is as S0.8 records” | R110 (both support paths and non-consumer execution), H542 (written vendor selection). | No remaining condition. S4.13 retains the non-consumer run checks and checks the specified support; V48 escalates infeasibility to the PRD owner before S1.17. The requirement is not changed to one arbitrary path. |
+| F7 | BLOCKING | CLOSED | V243: “it freezes writes and claims, then takes that upgrade's own backup”; V245: “a rollback restores that upgrade's own backup in a test environment, and the last audit event and run state committed before the freeze are present” | H803 (freeze and no committed-write loss), H585 (rollback versus disaster restore), R151 (upgrade/restore). | No remaining condition. S6.4 keeps refusal through acceptance or rollback; S6.6 tests both a write and a claim during the freeze. S6.3 remains the separate disaster-restore case. |
+| F8 | BLOCKING | CLOSED | V117/V118: “the check adds no core dependency the maintainer has not admitted on record (AI-11)”; V55: “a core dependency either needs is admitted by the maintainer, on record, before it is added” | H894 (each core dependency admitted), H258 (licence check). | No self-dependency is introduced: the maintainer admits any bootstrap dependency before it is added; the checks need not already exist to be written. |
+| F9 | BLOCKING | PARTLY | V173 Deps: “S0.6, S3.2”; V270: “The fault suite, then the S2.7 and S2.9 tests”; V85: “directly or through an earlier story” | H441 (runner operation boundary), H687 (local ceilings), H204 (cancel/timeout cases). | S2.17 need not reach S2.7/S2.9: the M2 verification row explicitly runs their story tests in addition to the fault suite. The six cited DOC edges and five test prerequisites are closed, but the same missing-spec cause also affects S4.9: V207 promises “a feature the agent lacks shows unavailable before dispatch in API and CLI”, with only “S1.17” in Deps and no path to S0.5, the specifying CLI LLD (V97; H221; R109). Missed in review 1; merged here to preserve one cause, one finding. Smallest fix: add `S0.5, ` to S4.9's Deps (+6 bytes); equal safe trim V7: `Statuses are quoted from each file as read on` → `Each file's status is quoted as read on` (−6 bytes). Net 0; body stays 59,958 bytes. S5.6 promises no CLI behavior and does not need that edge. |
+| F10 | BLOCKING | CLOSED | V121: “with its documented prerequisites in place, starts server, Postgres and one runner”; V121: “no separate workflow cluster runs” | H795 (Compose topology and same-image runners), R144 (external prerequisites). | No remaining condition. Image layout stays with S0.13 rather than mandating Postgres inside the product image; S6.1 retains the same-image additional runner. |
+| F11 | BLOCKING | CLOSED | V74: “S6.12 reads NFR-1 PASS and holds the NFR-2 report”; V74: “every P0 story (S5.17 if FR-20 is P0) is accepted and every applicable gate closed”; V233: “P0 only if the maintainer records, before HLD-000 approval, that the partner repo survey resolves PRD option set 3 to A” | R103 (all P0 before alpha), R144 (miss is not waived), R124 (FR-20 timing), H889 (release benchmark gate). | Release now requires the measured verdict, report, applicable gates and conditional test; producing a FAIL report cannot pass M6. The changed sampling criterion in S6.12 is assessed separately as a revision-introduced cause. |
+| F12 | ADVISORY | CLOSED | V13: “VISION APPROVED v2; PRD-000 APPROVED v2; R2 APPROVED v2; R3 APPROVED v4; R1 APPROVED v2”; V22: “Every run gets its own checkout and branch (FR-9). Tier is a policy attribute shown before dispatch (FR-10)”; V53: “reassessing §3.2 Option 4 and an out-of-process Wasm host under §9.1 Option 1.” | H8 (Inputs), H356 (tier statement), H884–895 (all action-item subjects, owners and blockers). | Literal source columns are now distinct from the plan-impact column; all 12 owner, subject and blocker comparisons pass. Exact fragments, not ellipses presented as source text, suffice. |
+| F13 | ADVISORY | CLOSED | V278: “the stories whose acceptance lines together cover the PRD's Accept line”; V309 Verified by: “S1.20, S2.8, S3.19, S6.11”; V284: “supplemental: S6.7, core-only build; conditional: S5.17”; V301: “conditional; specification: S0.10” | R132 (distributed CLI acceptance), R107 (core-only workflow), R124 (conditional second host). | Four columns suffice: parentheses explicitly distinguish specification, supplemental and conditional evidence from full acceptance. The corrected FR-28 set covers start/cancel/diff/gate/PR. The recomputed matrix comparison below accounts for all remaining literal deltas. |
+| F14 | BLOCKING | CLOSED | V162: “A checkout path containing a symlink and one containing a traversal segment are each rejected”; V162: “even when the path would stay inside the runner's checkout root” | H356 (symlinks and traversal rejected). | No remaining condition: the weaker outside-root-only policy is gone. |
+| F15 | ADVISORY | CLOSED | V99: “rootless or user-namespaced”; V99: “which of the two modes it used” | H795 (runtime alternative), H137 (measured runner support). | S0.7 retains both permitted modes and records the AI-6 owner's measured mode; it does not select a concrete runtime. |
+| F16 | BLOCKING | CLOSED | V95: “each carried over TLS”; V105: “where client-to-server TLS terminates”; V122: “a token sent to the documented endpoint without TLS is denied”; V250: “CLI results, read over TLS, equal API reads” | H818 (client/server TLS), H238 (HTTPS). | API/install LLDs allocate the boundary; M1 and release tests enforce it. No library or termination topology is invented. |
+| F17 | BLOCKING | CLOSED | V159: “only an executor meeting S0.2's criteria for a confirmed baton-owned orphan”; V159: “an executor assigned to an active run and one baton did not create both survive”; V99: “failure ownership: provider reports, reconciler decides” | H350 (provider/reconciler ownership), H841 (reconciliation then disposal). | A list mismatch is no longer the disposal authority; both protected negative cases are observable. |
+| F18 | BLOCKING | CLOSED | V106: “the compatibility artefact (the previous release's runner build) that the upgrade test runs”; V244: “The previous release's runner build, unmodified”; V244: “runs from before the upgrade stay readable” | H803 (previous runner version and old-run reads). | The actual prior build, not a protocol-number surrogate, is now required. |
+
+### New findings
+
+1. **F19 [BLOCKING] — The alpha report can accept an unrepresentative pilot sample.** Introduced by the revision: v1 P248 required representative pilot repos; V251 now accepts results “on the pilot repos the AI-6 owner names”. R145 explicitly requires “on representative pilot repos”. The owner must choose and measure the sample, but that does not remove the required sampling property; naming arbitrary convenient pilot repos can satisfy the new acceptance while building the wrong NFR-2 evidence artifact. S0.15 merely specifies the NFR-2 report and S5.13 calculates stages, so neither restores that testable criterion. **Smallest fix:** V251 replace `on the pilot repos the AI-6 owner names` with `on representative pilot repos` (−10 bytes). It saves rather than costs bytes, so no compensating deletion is required; AI-6's owner remains stated earlier in the same cell. With this fix alone the body is 59,948 bytes; with F2/F9's byte-neutral fixes it is still 59,948 bytes.
+
+### Check tables (v2)
+
+#### 1. Requirement coverage, independently recomputed
+
+Script parsed the 44 PRD requirement entries and story title/Traces/acceptance before comparing with Delivered/Verified columns; output: **39 unconditional P0; P0 without a story `[]`; unknown requirement IDs `[]`; matrix-only story mappings `[]`.** All 44 priority/withdrawal dispositions match the source, including the literal FR-20 condition. Omitted M0 specifications are intentional under V278; the only other literal delta is NFR-1→S6.11, because that test consumes the prerequisites but does not perform the three-attempt benchmark. It is not missing NFR-1 proof. These are literal mappings, not claims that an ID mention itself proves acceptance; F2/F9/F19 qualify the safety, dependency and NFR evidence.
+
+| Requirement | Source line; exact priority/withdrawal | Recomputed story IDs | Difference from matrix | Result |
+|---|---|---|---|---|
+| FR-1 | R105; P0 | S0.3, S1.7, S1.8, S1.9 | omitted M0: S0.3 | Mapped |
+| FR-2 | R106; P0 | S0.3, S1.11, S1.18, S1.19, S1.20, S2.10, S2.16 | omitted M0: S0.3 | Mapped |
+| FR-3 | R107; P0 | S0.17, S1.26, S4.14, S5.17, S6.7, S6.11 | omitted M0: S0.17 | Mapped |
+| FR-4 | R108; P0 | S0.8, S1.17, S4.12, S4.13 | omitted M0: S0.8 | Mapped |
+| FR-5 | R109; P0 | S0.8, S4.9, S4.10, S4.11 | omitted M0: S0.8 | Mapped; F9 dependency open |
+| FR-6 | R110; P0 | S0.8, S1.14, S1.17, S4.12, S4.13 | omitted M0: S0.8 | Mapped |
+| FR-7 | R111; P1 | — | none | No alpha story; P1 |
+| FR-8 | R112; P1 | — | none | No alpha story; P1 |
+| FR-9 | R113; P0 | S0.7, S1.16, S2.11, S2.15, S2.16 | omitted M0: S0.7 | Mapped |
+| FR-10 | R114; P0 | S0.7, S1.10, S1.16, S4.5, S4.8 | omitted M0: S0.7 | Mapped |
+| FR-11 | R115; P0 | S0.7, S4.1, S4.2, S4.5, S4.6, S4.8 | omitted M0: S0.7 | Mapped |
+| FR-12 | R116; P0 | S0.6, S1.12, S1.15, S2.1, S2.17, S6.1 | omitted M0: S0.6 | Mapped; F2 open |
+| FR-13 | R117; P0 | S0.6, S2.5, S2.7, S2.8, S4.11 | omitted M0: S0.6 | Mapped |
+| FR-14 | R118; P0 | S0.2, S0.6, S1.15, S1.18, S1.21, S2.1, S2.2, S2.4, S2.5, S2.6, S2.12, S2.17 | omitted M0: S0.2, S0.6 | Mapped; F2 open |
+| FR-15 | R119; P0 | S0.3, S1.21, S1.22, S1.23, S3.19 | omitted M0: S0.3 | Mapped |
+| FR-16 | R120; P0 | S0.9, S1.24, S3.11, S3.12, S3.16, S3.17, S3.22, S4.7 | omitted M0: S0.9 | Mapped |
+| FR-17 | R121; P0 | S0.9, S1.24, S3.4, S3.13, S3.22 | omitted M0: S0.9 | Mapped |
+| FR-18 | R122; P0 | S0.10, S1.25, S2.13, S3.14, S3.15, S3.16, S3.22 | omitted M0: S0.10 | Mapped |
+| FR-19 | R123; P0 | S0.10, S1.25, S6.11 | none | Mapped |
+| FR-20 | R124; P1; becomes P0 if option set 3 resolves to A before HLD approval | S0.10, S5.16, S5.17 | none | Mapped |
+| FR-21 | R125; P0 | S0.9, S1.10, S3.5, S3.6, S4.3 | omitted M0: S0.9 | Mapped |
+| FR-22 | R126; P0 | S0.9, S0.11, S1.11, S1.25, S3.7, S3.12, S3.16, S3.20, S4.11 | omitted M0: S0.9, S0.11 | Mapped |
+| FR-23 | R127; P0 | S0.11, S3.5, S3.8, S3.9, S4.11 | omitted M0: S0.11 | Mapped |
+| FR-24 | R128; P0 | S0.9, S2.9, S4.4, S5.1 | omitted M0: S0.9 | Mapped |
+| FR-25 | R129; P0 | S0.9, S5.2, S5.3, S5.4, S5.5, S5.6 | omitted M0: S0.9 | Mapped |
+| FR-26 | R130; P0 | S0.4, S1.24, S3.1, S3.2, S3.4, S3.22 | omitted M0: S0.4 | Mapped |
+| FR-27 | R131; P0 | S0.3, S1.6, S1.19, S1.23, S3.21, S6.9 | omitted M0: S0.3 | Mapped |
+| FR-28 | R132; P0 | S0.5, S1.9, S1.20, S2.8, S3.19, S6.11 | omitted M0: S0.5 | Mapped |
+| FR-29 | R133; P0 | S0.12, S5.7, S5.8, S5.9 | none | Mapped |
+| FR-30 | R134; P1 | — | none | No alpha story; P1 |
+| FR-31 | R135; P0 | S0.13, S1.3, S1.5, S6.1, S6.8, S6.11 | omitted M0: S0.13 | Mapped |
+| FR-32 | R136; P0 | S0.16, S5.14, S5.15 | omitted M0: S0.16 | Mapped |
+| FR-33 | R137; withdrawn, see Review log | — | none | No story; withdrawn |
+| FR-34 | R138; P0 | S0.4, S1.6, S3.2 | omitted M0: S0.4 | Mapped |
+| NFR-1 | R144; P0 | S0.13, S6.8, S6.10, S6.11, S6.12 | omitted M0: S0.13; other: S6.11 | Mapped |
+| NFR-2 | R145; P0 | S0.15, S5.12, S5.13, S6.12 | omitted M0: S0.15 | Mapped; F19 sample condition open |
+| NFR-3 | R146; P0 | S0.2, S0.17, S1.8, S2.17, S3.18 | omitted M0: S0.2, S0.17 | Mapped |
+| NFR-4 | R147; P0 | S0.7, S4.1, S4.2, S4.5, S4.8 | omitted M0: S0.7 | Mapped |
+| NFR-5 | R148; P0 | S0.4, S0.11, S1.6, S1.13, S1.14, S2.3, S3.4, S3.10, S5.15 | omitted M0: S0.4, S0.11 | Mapped |
+| NFR-6 | R149; P0 | S0.4, S1.19, S3.3 | omitted M0: S0.4 | Mapped |
+| NFR-7 | R150; P0 | S4.14, S6.11 | none | Mapped |
+| NFR-8 | R151; P0 | S0.14, S1.4, S2.14, S6.2, S6.3, S6.4, S6.5, S6.6 | omitted M0: S0.14 | Mapped |
+| NFR-9 | R152; P0 | S0.1, S1.1, S1.2, S6.7, S6.11 | omitted M0: S0.1 | Mapped |
+| NFR-10 | R153; P0 | S0.11, S1.11, S3.8, S3.20, S5.10, S5.11 | omitted M0: S0.11 | Mapped |
+
+#### 2–3. Changed decisions and reserved implementation choices
+
+Script: literal substring search of every double-quoted span in V13 and all D1–D18 rows, restricted to the HLD body; row-by-row source comparison for the action items. Results are in quotation order. This also checks shortened D1/D4/D15/D16 spans, not only the seven singled out in the handoff.
+
+| Item | V line | Script output (H lines) | Result |
+|---|---|---|---|
+| Inputs | 13 | `[8]` | Exact contiguous source span. |
+| D1 / D2 | 20 / 21 | `[217]` / `[42]` | Exact; AI-2 reversibility and Compose remain. |
+| D3 | 22 | `[356, 356]` | Both spans exact; removed parenthetical is not represented by a false ellipsis. |
+| D4 | 23 | `[389, 391, 391]` | Exact; bounded eligibility/default condition retained. |
+| D5 | 24 | `[441, 441]` | Exact; eligibility/fencing acceptance is assessed in F2. |
+| D6 | 25 | `[491, 542]` | Exact; vendor selection still owns the first pair. |
+| D7 | 26 | `[548, 550, 550]` | Exact; at-least-once deduplication retained. |
+| D8 / D9 | 27 / 28 | `[583]` / `[585]` | Exact; canonical states and separate retention retained. |
+| D10 | 29 | `[649, 649]` | Exact; both gate phases and error/ineligible condition retained. |
+| D11 / D12 | 30 / 31 | `[662, 662]` / `[677, 677]` | Exact. |
+| D13 | 32 | `[687]` | Exact; local/disconnected ceilings retained. |
+| D14 / D15 | 33 / 34 | `[710, 712]` / `[720, 720]` | Exact; survey condition and server-only writable identity retained. |
+| D16 / D17 | 35 / 36 | `[739, 737, 737]` / `[764, 764, 774, 774]` | Exact; tenancy, contracts and edition boundary retained. |
+| D18 | 37 | `[803, 803, 803]` | Exact; Compose remains in D2/S0.13/S1.5/S6.1, not lost by shortening D18. |
+| Gate subjects/blockers | 45–56 | 12/12 subjects and 12/12 blockers exact at H884–895 | Passed; owners separately 12/12 exact. |
+
+Changed-acceptance script: 42 cells; added/removed/renumbered story IDs `[]`; technology scan `[]`; literal-path scan `[]`. Manual reading of all 42 cells finds **no concrete language, library, schema/table/column name, wire format, configuration key or file path**, and no newly selected choice reserved by the HLD. The schema/wire/protocol/configuration terms occur as topics for S0.2/S0.3/S0.6/S0.7/S0.8/S0.12/S0.13/S0.14, not decided identifiers. Logical state, actor/SHA fields, Postgres/Compose, TLS, fencing, rootless/user-namespaced and secret references are source-fixed mechanisms (H550/H441/H795/H818/H737), not invented technologies. S2.15's checkout-root rule is H356's policy, not a path. S4.11's reconciliation path is explicitly assigned to S0.2. The missing approved CLI-spec predecessor is F9, not an invented concrete choice in the revised cell.
+
+#### 4. HOLD and gates
+
+Script parsed H884–895's owner, subject and Blocks into separate fields and compared them byte-for-byte with V45–56: **12/12 owner, 12/12 subject, 12/12 blocker exact**. Direct AI-1 on every executable story: **105/105**; exceptions `[]`. V3, V82 and V333 keep the maintainer-controlled HOLD and also bind TEST/OPS; documentation may be drafted, not used to authorize execution. A re-verification APPROVE would not close an action item or authorize code.
+
+| Gate | V / H lines | Source-field comparison | Direct story gates from script | Operational result |
+|---|---|---|---|---|
+| AI-1 | 45 / 884 | owner/subject/blocker exact | every CODE/TEST/OPS | HOLD retained, no executable exception. |
+| AI-2 | 46 / 885 | all exact | S0.1, S0.6, S0.7 | Document approvals wait; runner work inherits; Risk 2 re-plans a changed baseline. |
+| AI-3 | 47 / 886 | all exact | S4.6, S6.11, S6.12 | Default/pilot blocked; S4.14 is controlled-fixture-only. |
+| AI-4 | 48 / 887 | all exact | S0.8, S1.17, S4.12 | Vendor selection and FR-6 owner escalation occur before first adapter code. |
+| AI-5 | 49 / 888 | all exact | S0.10, S5.16, S5.17 | Survey owns host selection and exact pre-HLD-approval priority condition. |
+| AI-6 | 50 / 889 | all exact | S6.12 | S0.7 itself records runner mode evidence; M6 requires benchmark PASS/report. No producer self-gate. |
+| AI-7 | 51 / 890 | all exact | S5.11 | S0.9 specifies/closes default; purge waits. |
+| AI-8 | 52 / 891 | all exact | S5.16, S5.17 | Mapping is checked in S0.10; conditional consumers wait. |
+| AI-9 | 53 / 892 | all exact | none | Deferred runtime/host reassessments remain outside P0. |
+| AI-10 | 54 / 893 | all exact | none | Optional backend not built. |
+| AI-11 | 55 / 894 | all exact | S1.3; global every dependency addition | S1.1/S1.2 explicitly require recorded admission of any dependency they add. |
+| AI-12 | 56 / 895 | all exact | S4.6, S6.11 | Default and pilot carry both owner decisions, not only the security review. |
+
+#### 5. Dependency graph and specifying-document closure
+
+Script parses Deps/Blocked, checks undefined references and DFS cycles, then computes transitive predecessors. Relevant-spec mapping covers all 86 CODE rows, assigning API/identity/CLI, state/audit, runner/provider/adapter, policy/host, install/upgrade or observability/heartbeat documents by behavior. Direct DOC edges are not required when the relevant DOC is reached transitively; unrelated stack reachability is insufficient.
+
+| Probe | Script output | Result |
+|---|---|---|
+| Total | 125: DOC 20, CODE 86, TEST 14, OPS 5 | IDs unchanged. |
+| M0 | DOC 17 = 17 | Design only. |
+| M1 | CODE 22, TEST 1, OPS 3 = 26 | First executable milestone. |
+| M2 | CODE 15, TEST 2 = 17 | Count matches. |
+| M3 | CODE 19, TEST 3 = 22 | Count matches. |
+| M4 | CODE 11, TEST 3 = 14 | Count matches. |
+| M5 | CODE 14, TEST 3 = 17 | Two stories conditional. |
+| M6 | CODE 5, TEST 2, OPS 2, DOC 3 = 12 | Count matches. |
+| Structural | unknown story/gate `[]`; later milestone `[]`; later same-milestone row `[]`; cycles `[]` | Clean structural DAG. |
+| DOC coverage | CODE with no DOC `[]`; direct M0 DOC **23/86** | Generic coverage passes, not the relevant-spec test below. |
+| Relevant-spec coverage | map count 86; unmapped CODE `[]`; **85/86** complete; missing `[(S4.9, S0.5)]` | F9 remains PARTLY. A provisional overbroad S5.6→S0.5 assignment was rejected: it names no CLI behavior. |
+| Original six pairs | S2.4→S0.7, S2.7→S0.8, S2.9→S0.7, S3.4→S0.6, S4.5→S0.5, S5.4→S0.5: all `True` | All originally listed subject gaps closed. |
+| Explicit acceptance references | references absent in closure `[]` | No dangling specifying-ID reference. |
+| S1.26 | S1.17/S1.24/S0.17/S0.4 `True`; S3.2/S3.11 `False`; later-milestone predecessors `[]` | Minimum fixture roles/current-SHA/audit are M1-owned; no later dependency is needed for them. Expired-upload refusal remains F2, not a dependency on M2 renewal. |
+| S2.17 | S2.7/S2.9 both `False` | Sufficient alternative: V270 explicitly runs both story-test sets at M2 exit; the suite does not claim those cases. |
+| S4.13 | S4.12/S1.23 both `True` | Both adapters to Candidate with API-read diff now have prerequisites. |
+| S4.14 | S4.8/S3.17 `True`; S3.18 `False` | Isolation/staleness reached; restart-gate case is not this suite's acceptance. No unrelated edge needed. |
+| S6.11 | S2.8/S3.19 both `True` | Full CLI comparison prerequisites reached. |
+| Effective S4.14 gates | AI-1, AI-2, AI-4, AI-5, AI-11 | Sufficient for controlled fixture; not pilot eligibility evidence. |
+| Effective S6.11 gates | AI-1, AI-2, AI-3, AI-4, AI-5, AI-11, AI-12 | Both pilot decisions inherited/direct. |
+| Effective S6.12 gates | AI-1, AI-2, AI-3, AI-4, AI-5, AI-6, AI-11, AI-12 | Release checks all applicable gates and every P0 story at V74. |
+
+#### Prose/acceptance preservation and extra changes
+
+| Probe | Script output / evidence | Result |
+|---|---|---|
+| All acceptance cells that got shorter | Only S2.2: v1 P148 **123** bytes → V149 **114** bytes (−9). V149: “Terminal status carrying an older epoch is rejected, as events (S1.18) and commits (S1.21) already are; tests pass”. | Read in full. Earlier event/commit cases moved to S1.18/S1.21, second-claim refusal to S1.15; Deps now reaches S1.21. No v1 assertion is lost in this shortening. Post-expiry upload testing is the still-open F2 condition, not a removed v1 test. |
+| Longer cells and prose trims | All 41 other changed acceptance cells grew; S6.12's growth replaced the representative-sample requirement. Only changed story gate: S6.11 `AI-1` → `AI-1, AI-3, AI-12`; no gate removed. | Cannot confirm the author's blanket preservation claim: F19 loses one NFR condition despite net growth. Sources' removed use column is redundant with stories; estimates retain LOW confidence, rate/rounding, conditional omission and HOLD/clock; review's removed LLD-stop sentence survives in strengthened Risk 7 (V339). Other condensed risk/scope prose removes no acceptance or gate. |
+| Extra S0.12 | V104: “compiled-in P0 providers with out-of-process extensions only on runners or as separate services”; H764. | Faithful boundary clarification, no scope creep and no optional host implementation added. |
+| Extra S2.14 | V161: “a user S0.4 authorises reads them back”; S1.18 already reaches S0.4. | Makes authority explicit without deciding a role; no scope creep or invented decision. |
+| Extra Verification M5 | V273 adds running S5.1/S5.4 story tests, already in its Proved by cell. | Correct evidence wiring, not new behavior. |
+| Extra fault-level citations | V260 cites S2.13, S2.17, S3.7, S3.15, S3.20. | Host outage, death/duplicate/restart, policy failure, webhook loss and audit failure now point to their actual owning stories; no scope expansion. |
+| Plan-defined quoted terms | V41 defines “Closed”; V278 defines “Delivered by” and “Verified by”. | Acceptable: clearly definitions of this plan's controls/table labels, not assertions of literal HLD wording. |
+
+#### 6–8. Changed-story quality, scope and milestone exits
+
+| Probe | Output / reviewed population | Result |
+|---|---|---|
+| Changed acceptance tally | M0 10; M1 14; M2 4; M3 4; M4 4; M5 1; M6 5 = **42/42** | All changed cells read; no cell selects a concrete implementation reserved for its LLD. |
+| Full population screen | M0 17; M1 26; M2 17; M3 22; M4 14; M5 17; M6 12 = **125/125** | All rows read in full; the v1 one-behavior/document/suite assessment remains unless changed. Missing `tests pass` on CODE/TEST `[]`; judgment-word scan `[]`. |
+| Scope/conditional gates | V62, V204, V233–234, V48–49, V335 | No added story or P1 scope; first pair is vendor-gated, default is AI-3/AI-12 conditional, second host keeps R124's timing and AI-5/AI-8. Boundary fixes do not build the deferred runtime/host. |
+| M1 §1 slice | Steps 1–5, 8, 10–11; step 9 only vacuous for an explicit no-required-check fixture policy | No later-milestone prerequisites. Full permission/cancel, nonempty checks, host status/merge and terminal cleanup remain later breadth. Roles/current-SHA/audit now present; lease-expired candidate upload is the remaining F2 invariant. |
+| M2/M4 evidence | V270 explicitly runs cancel/timeout tests; S4.13 reaches diff-read; S4.14 reaches isolation and staleness | Evidence alternatives close the originally cited test gaps; controlled fixtures are not claimed as pilot evidence. |
+| M5/M6 exits | V73 requires conditional S5.17; V74 requires NFR-1 PASS, NFR-2 report, every P0 and every applicable gate | Exit outcomes are observable and cannot substitute a report artifact for PASS. F19 still permits the wrong NFR-2 sample property. |
+
+#### 9. Format and hygiene
+
+| Probe | Command/script output | Result |
+|---|---|---|
+| README sections | V5 Source design docs; V58 Milestones; V76 Stories; V253 Verification strategy; V327 Risks; V343 Review log | Required sections in order; V39 Gates is supplemental. |
+| Body limit | Required `LC_ALL=C awk` byte count: **59,958**; entire plan **67,078** bytes, **372** lines | PASS: 42 bytes headroom; Review log excluded as specified. |
+| HTML comments | Delimiter scan exit **1**, stdout empty; Python matching lines `[]` | PASS. |
+| Private-token scan | Required case-insensitive four-token `rg` scan exit **1**, stdout empty | PASS; exact supplied scan was used, not a weaker pattern. |
+| Absolute-home scan | Required `/Users/` `rg` scan exit **1**, stdout empty | PASS. |
+| Story and milestone names | duplicate definitions `[]`; undefined references `[]`; milestone name mismatches `[]`; count mismatches `[]` | PASS, including retained S2.2 ID and changed title. |
+| States/tiers | near-state spellings `[]`; all 15 exact canonical names present; code-span tier token set `[trusted-local]`; alternate identifier spellings `[]` | PASS. Hardened container and reserved microVM are source-consistent prose labels, not invented identifiers. |
+| Review log | 18 distinct finding dispositions, all `changed`, no rebuttal | Appropriate for v2; the v1 empty-log criterion does not apply to a revised plan. Dispositions are not closure proof. |
+| Minimal-fix fit | In-memory exact-row simulation of F2/F9/F19 corrections plus safe trims: **59,948** body bytes, **52** bytes headroom | No plan write performed. F2 +17/−17; F9 +6/−6; F19 −10. No acceptance, gate or condition trimmed. |
+| Recommended status fit | Exact verdict status replacement adds **4** bytes; all fixes and status yield **59,952** body bytes, **48** bytes headroom | Fits without another trim; no plan write performed. |
+
+### What is strong in v2
+
+- Minimum role/repo authority, same-SHA PR gating, atomic PR audit and TLS are now on M1's own path. Breadth is deferred without requiring M1 to implement all administration or CI execution.
+- The bounded container envelope is explicit: affirmative eligibility, no fallback, hostile code refusal, controlled fixtures before the pilot decision, and both owner gates on the pilot.
+- Upgrade freeze precedes the upgrade-specific backup; the drill tests rollback with the last pre-freeze audit/state. Previous-runner compatibility uses an unmodified prior release build.
+- Gate source text is literal and separate from plan impacts; the four-column matrix labels specification/supplemental/conditional evidence clearly; measured release outcomes cannot be waived by merely producing an artifact.
+- The revised graph is structurally clean, and all original six missing DOC links and five test prerequisite links were corrected. Remaining fixes are small and fit inside the byte cap without deleting safety or acceptance conditions.
+
+### Learnings / mistakes
+
+- I initially followed a compacted example using a quoted home-variable path; `view` treated it literally and failed. I used the resolved input path thereafter: built-in path parsing is not shell expansion.
+- Conversation search snippets remained capped even when requesting a larger snippet. I recovered only this thread's two original task messages read-only from the local store; never infer omitted instructions or substitute the latest relay for the original source requirements.
+- I drafted the missed CLI dependency as a new finding before the duplicate-free pass. It shares F9's cause, so I merged it into F9 and renumbered the sole revision-introduced finding F19; one cause, one finding.
+- A byte calculation for a prose trim was initially off by three bytes. The UTF-8 calculation caught it; the recorded fixes now use measured equal trims and an exact targeted-row simulation, not character guesses.
+- Audit scripts had a failed comprehension, a backtick regex crossing lines, and a final gate parser treating numbered HLD action items as table rows. I corrected each and reran the failed probe before relying on it; parser errors are not audit results.
+- The first broad relevant-spec map over-assigned the CLI LLD to S5.6, which promises no CLI behavior. I rejected that pair on the acceptance text and kept only S4.9's actual CLI dependency; dependency audits must follow promised behavior, not proximity.
+- Several read-only calls automatically promoted despite the no-background-task instruction, including one requested with a longer foreground timeout. I did not launch, poll or delegate background work; incidental tool promotion is not permission to scaffold a later iteration.
+- The author's longer S6.12 cell removed a required sampling property. Net growth and checking only shorter cells are not preservation proofs; compare changed clauses against their source requirement too.
+- A post-compaction recovery first queried the legacy conversation database and the wrong message type; empty results exposed both errors. I recovered the exact task text read-only from this thread in the current store before writing the verdict; absence from one store is not absence of instructions.
