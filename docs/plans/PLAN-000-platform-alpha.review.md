@@ -1,0 +1,253 @@
+# Independent review — PLAN-000 platform alpha
+
+## Verdict
+
+**REVISE.** The draft preserves the HLD HOLD, but it does not yet give agents a faithful, executable path after the maintainer lifts it. The blocking findings alone determine this verdict: the first PR can be opened without the required authorization and gate checks, several safety or compatibility requirements can be marked done without proving the specified behavior, and the dependency and release criteria omit required evidence. The advisory findings do not affect the verdict.
+
+## Findings
+
+1. **F1 [BLOCKING] — The walking skeleton can open a real PR without an authorized, fail-closed gate.** P112 says “Omitted on purpose until later milestones: roles, pre-PR checks (policy requires none here, so Checks passes with nothing to run)”; P139 accepts “a signed-in user's approval” and P337 confirms “until M3 any signed-in user can register a repo and approve.” P140 only checks “With approval current at the SHA”; P180 tests evaluation error for PR creation only, and P184 tests host-check failure, not an injected evaluation error at merge eligibility. H207 requires “A distinct authorised reviewer sees diff, SHA and checks and approves or rejects that SHA”; H208 says “With approval and checks current at that SHA and audit committed, the server opens exactly one PR”; H739 says “Every query is scoped by org and repo membership in the API layer”; R120 says “an injected gate evaluation error blocks PR creation and merge eligibility.” A development host and two signed-in users do not enforce those invariants. **Smallest fix:** put the minimum fixture member/reviewer and repo scopes in M1 via S0.4, require the authorized reviewer and a current same-SHA gate at PR effect time (atomic audit separately in F3), and use an explicit fixture policy with no required pre-PR checks (deny an unsupported nonempty requirement). Keep full administration and host status in M3, keep branch protection active on the M1 test repo (H154), and add merge-eligibility evaluation-error and SHA-change-before-PR assertions to the existing gate suite. Leave the submitter-exclusion detail to S0.9, not the reviewer role itself.
+2. **F2 [BLOCKING] — Claims do not prove runner eligibility and fencing.** P130 accepts “A registered runner claims the Queued run”; P112 defers “lease expiry,” and P148 postpones rejecting “an older epoch”. H200 says “An eligible runner claims the run outbound under a fenced lease”; H441 requires “heartbeat-renewed leases with fencing epochs”; H583 says an ambiguous lease “enters NeedsReconciliation and never gets a second writer on that checkout”. **Smallest fix:** require a mismatched registered runner to leave the run queued; establish/verify the minimum expiring fenced lease and stale-write refusal on the M1 path, leaving fault recovery scenarios in M2.
+3. **F3 [BLOCKING] — Tool grants and PR/decision transitions lack a fail-closed atomic-audit contract.** P206 accepts “the decision is audited” and “with policy evaluation unavailable the tool is denied”; it says nothing about an audit write failing before delivery of an allowed answer. Likewise P140 and P184 can pass without testing the audit outcome of the PR/eligibility transition; P177 tests read fields, not that task, permission and PR decisions appear. H157 requires “A privilege transition commits only with its audit event”; H550 says “One transaction appends the event, changes run state, writes audit and enqueues the next step”; R126 tests “with policy evaluation unavailable or the audit write rejected, a run cannot gain tools or pass a change gate”; R127 names “task, run, permission, policy, approval and PR decisions.” **Smallest fix:** make the existing permission and gate/outbox rows commit decision, state/audit and next work before answers/effects; add rejected-audit denial for granting a tool and preventing PR work to the existing fault suite, and exercise the named event kinds in S3.9. External host I/O stays at least once, outside the database transaction.
+4. **F4 [BLOCKING] — AwaitingInput can report a successful stop without confirmation.** P206 says “cancel and the time limit end AwaitingInput as Cancelled and TimedOut”, with no unresolved case or return from permission resolution; P153 reserves “NeedsReconciliation when the stop is unconfirmed” for `Running`. H204 explicitly lists “NeedsReconciliation (stop unconfirmed)”; H559 shows `AwaitingInput --> Running`; R117 requires “cancelling an active run prevents new tool work and records cancellation or a named reconciliation state in the shared view.” H573–576 draw normal cancel/timeout transitions but do not draw the ambiguous path from AwaitingInput. **Smallest fix:** have S0.2/S0.6 resolve that diagram/detail against the HLD workflow before consuming code; test confirmed stop, unresolved stop and permission resolution without ever reporting a successful stop for an unconfirmed writer. Keep the existing states.
+5. **F5 [BLOCKING] — Lower-trust eligibility can be bypassed before the pilot decision.** P196 only asks for a container volume; P200 checks sandbox-required selection and unknown tier/executor; P201 gates the *default* only; P247 already requires “the FR-3 scenario on a pilot repo” with no AI-3 dependency. H391 says “The container tier takes cooperative and controlled work on the org's own repos; hostile code is refused in P0, not downgraded” and “the pilot tier is unresolved (Assumption 2), and approval waits for it (Action Item 3).” H886 explicitly blocks “pilot eligibility”; H138 says “If strict no-egress is required, vendor CLIs are ineligible”. **Smallest fix:** in existing admission/tier stories and S0.7/S0.9 require affirmative approved eligibility, deny ineligible/unknown work without falling back, and restrict synthetic container tests to controlled fixtures until AI-3. Gate actual pilot tests/rollout on the recorded tier/egress decision, and on AI-12 wherever relying on the default. If the decision invalidates this plan, re-plan rather than add a microVM or substitute a tier here.
+6. **F6 [BLOCKING] — Adapter acceptance can stop at one credential path for a shipped agent.** P99 specifies “per-run scoped API keys with no consumer login”; P132 tests “a per-run scoped key and no consumer login”; P207 permits “a permitted API-key or enterprise path with no consumer login”. P208 disables subscription login, but no row owns support for both paths. R110 says “Support API-key and enterprise-billing credential paths for each shipped agent; do not require consumer-subscription login”; its Accept line is “each shipped adapter completes a run on a permitted non-consumer billing path with subscription login disabled.” H542 leaves the pair to the written check. **Smallest fix:** have S0.8 record how each selected adapter satisfies the exact R110 support obligation (a permitted integration may serve both billing paths); keep the stated non-consumer run test and check the documented path support in the existing adapter matrix. If vendor results make the written requirement infeasible, use AI-4's selection/fallback and resolve it with the PRD owner before code, not by inventing an unsupported login path.
+7. **F7 [BLOCKING] — Upgrade acceptance does not tie rollback to the frozen upgrade backup.** P238 accepts “One documented backup step captures Postgres and the artifact store”; P240 “refuses to proceed without a backup” and freezes writes “from backup until the operator accepts the new version”; P242 verifies restoring a test backup, not rollback of that exact frozen upgrade under refused writes. A prior ordinary backup can satisfy the letter of the upgrade criterion without preserving writes up to the upgrade boundary. H803 says “from backup until the operator accepts the new version the server refuses writes and claims, so a rollback restore loses no committed write, audit included”; H585 separates rollback from disaster restore. **Smallest fix:** S6.4/6 must establish the write-and-claim freeze before taking the specific upgrade backup, test that writes/claims are refused through acceptance or rollback, then restore that backup and verify the last pre-freeze committed audit/state. Keep S6.3's disaster restore case separate.
+8. **F8 [BLOCKING] — The build-check bootstrap can add an unadmitted dependency.** P55 says “S1.3 and every later story that adds a dependency”; P116–117 introduce the checks before S1.3 with only AI-1, while P92 chooses a “dependency-licence tool with its allow-list”. If those checks introduce a dependency, P55 leaves that addition outside the gate. H894 blocks “admission of each core dependency under I2 (NFR-9)”; H258 says “dependencies still pass the licence check”. **Smallest fix:** require explicit maintainer approval before either bootstrap story adds any core dependency (or implement the check using already-admitted tooling); don't require the completed check as a prerequisite for writing that same check.
+9. **F9 [BLOCKING] — The DAG omits specifying documents and executable test prerequisites.** P84 says “each takes them from the DOC story in its Deps”; S3.4 at P172 tests “S0.6's operation list” with only `S3.2` in Deps and no path to S0.6. The subject audit found five more missing DOC paths (check 5), including S2.9→S0.7 for executor ceilings. P267 claims the M2 fault suite covers “cancel, time limit”, yet P163's suite neither tests those cases nor depends on S2.7/S2.9. H441 fixes the operation boundary, H687 says “the runner enforces time, CPU, memory and storage ceilings locally, even disconnected,” and H204 defines the observable cancel/timeout results. **Smallest fix:** add the subject-specific predecessor edges in check 5 (or an explicit equivalent approved-spec barrier), and require only the actual implementation dependencies for each suite. For M2, either list and run the existing cancel/time-limit story tests at exit or include them in S2.17 with those edges. Tie M4/M6 claims to the tests that really exercise them; do not blindly add unrelated prerequisite edges.
+10. **F10 [BLOCKING] — The Compose criterion leaves the image topology and success boundary ambiguous.** P120 says “starts server, Postgres and one runner from one image” and “nothing else is needed”. The acceptance can require Postgres to be embedded in the product image or treat the documented external credentials/runtime as unacceptable, neither dictated by H795 (“One Compose file: server, Postgres, one runner; more runners from the same image”) or R144 (“assumes a supported host, container runtime, runner resources, Git and agent credentials, a reachable OIDC provider with a test client, and documented Compose prerequisites”). **Smallest fix:** have S1.5 test that S0.13's one Compose command starts the three services and the server reports healthy on documented prerequisites, with no separate workflow cluster; leave image layout to the install LLD, preserving the same-image remote runner rule.
+11. **F11 [BLOCKING] — Release exit can pass without required measured and conditional evidence.** P248 allows a completed report where “a miss reads FAIL”; P74 lists first run, upgrade/restore and FR-3 but no evidence verdict, despite P50 stating that AI-6 blocks “S6.12 and the alpha release.” P230 says S5.16 “exists only if the partner repo survey resolves PRD option set 3 to A” but omits the approval timing that P298 itself quotes. R103 says “**P0** must pass before the 12-week alpha”; R144 says “A miss fails this NFR and triggers a VISION target review, not a waiver”; R124 says “becomes P0 if option set 3 resolves to A before HLD approval”; H889 blocks “alpha release and §10.1's install target.” **Smallest fix:** make release exit require the S6.12 NFR-1 PASS and NFR-2 evidence, and completion of P0 and applicable gates, not merely a report artifact. Make the M5/release exit require S5.17 only under the exact recorded pre-approval FR-20 condition; otherwise retain the seam. Nothing in this fix authorizes release or code while the relevant gates stand.
+12. **F12 [ADVISORY] — Source gate blockers and abridged decision quotations are not literal.** P43 labels the last column “Blocks in this plan”; for example, P53 says “No story: §3.2 Option 4 and a Wasm host are outside P0”, while H892 says “Blocks: reassessing §3.2 Option 4 and an out-of-process Wasm host under §9.1 Option 1.” All 12 owner strings match, but all 12 source blocker strings are replaced by plan impacts. P22's `` `trusted-local` ... `` and P13's inputs are not literal contiguous matches at H356/H8. **Smallest fix:** preserve the plan-impact column, add verbatim HLD subject/blocker text, and either quote exact source spans in P13/P22 or mark deletions as editorial. Operational gate failures are tracked separately in F5/F8/F11, not raised here again.
+13. **F13 [ADVISORY] — The trace table sometimes overclaims or omits the actual proof.** P275 says “"Verified by" names the story whose acceptance repeats the PRD's Accept line.” P306 lists only S6.11, whose acceptance P247 says “CLI results equal API reads”; R132 explicitly says “the CLI starts and cancels a run, shows its diff/gate state and links to its PR, with results matching API reads.” The behavior is separately covered at P135/P154/P187. P281 also leaves out non-M0 S5.17 and S6.7 from the literal mapping, and P62 mentions S5.16/S5.17 only, missing the FR-20 spec trace in S0.10. **Smallest fix:** list the actual S1.20/S2.8/S3.19 CLI checks, and separate specifying, delivery and supplemental/conditional evidence labels so the matrix does not claim a full check from a partial acceptance. Keep intentional M0 omissions explicitly distinguished from missing evidence.
+14. **F14 [BLOCKING] — Checkout confinement accepts a weaker path policy than the HLD.** P161 rejects “A checkout path that leaves the runner's checkout root by symlink or traversal”; that lets symlink/traversal paths pass if they resolve inside the root. H356 says “Checkout paths are confined; symlinks and traversal are rejected”. **Smallest fix:** use S0.7 semantics and require symlink and traversal rejection in S2.15 as distinct cases, even for paths that appear to remain under the root.
+15. **F15 [ADVISORY] — The runner LLD shorthand hides the allowed runtime alternative.** P98 says “container hardening (rootless, dropped capabilities, seccomp, no daemon socket, quotas, egress policy)”; P197 instead tests “rootless or user-namespaced”; H795 says “it drives a rootless or user-namespaced container runtime, and no executor gets the daemon socket”. S0.7 owns the runtime choice and records the Assumption 8 evidence, so the apparent inconsistency in shorthand does not force a specific runtime if that choice is respected. **Smallest fix:** write “rootless or user-namespaced” in S0.7 as well and record which eligible mode the AI-6 owner measured.
+16. **F16 [BLOCKING] — No story owns the client-to-server TLS boundary.** P121 tests “A member of the test OIDC provider obtains a user token and calls the API”; P124 uses “a user-delegated token”; S0.4 and S0.13 cover identity/secret provisioning (P95/P104) but neither assigns TLS. H818 says “client to server (OIDC, TLS)”; H238 shows HTTPS. The plan can mark sign-in, CLI and release install done on a plaintext connection. **Smallest fix:** have the install/API LLDs allocate TLS termination and have the existing sign-in/install acceptance require the token-bearing API path over TLS. Do not decide a termination library or topology in the CODE row.
+17. **F17 [BLOCKING] — Orphan cleanup uses a list mismatch as authority to dispose.** P158 says the reconciler “disposes the unmatched” after comparing recorded IDs against the provider's orphan list. H350 assigns “failure ownership (provider reports, reconciler decides)”; H841 describes “Reconciler matches recorded executor IDs” and “Dispose and record”. An unexplained mismatch does not prove baton ownership or that the executor is no longer assigned to an active run. **Smallest fix:** require the S0.7/S0.2 reconciliation criteria for a confirmed baton-owned orphan and test that an active executor survives. Don't make ID mismatch by itself the disposal condition.
+18. **F18 [BLOCKING] — A protocol-number test does not prove previous-runner compatibility.** P241 accepts “A runner on the previous protocol version registers and completes a run against the upgraded server”; the current binary can be made to speak that version and pass while the previous binary does not. H803 explicitly says “the server accepts the previous runner version; old runs stay readable.” **Smallest fix:** run the actual previous runner build in S6.5 against the upgraded server, retaining the old-run read assertion; describe the compatibility artifact in S0.14.
+
+## Check tables
+
+### 1. Requirement coverage
+
+Sources: [plan](PLAN-000-platform-alpha.md), [HLD](../design/HLD-000-platform-overview.md), [PRD](../design/PRD-000-platform.md), [format](README.md). Below, `P`, `H` and `R` with a line number denote these three documents; review judgments are based on these sources, not on outside claims.
+
+Script: parsed only the two PRD requirement sections, parsed story titles/Traces/acceptance before reading the plan matrix, then diffed the resulting literal IDs with the union of its Delivered/Verified columns. Output: **44 IDs; 39 unconditional P0; P0 without a literal story: `[]`; unknown IDs: `[]`.** A literal match is not acceptance evidence. `−` = row reference omitted from the matrix; no matrix-only IDs were found. Its stated omission of specifying M0 DOCs (P275) explains most deltas; no priority is substantively different.
+
+| ID | PRD line; exact priority/withdrawal | Recomputed story IDs | Against matrix at P279–322 | Acceptance review |
+|---|---|---|---|---|
+| FR-1 | 105; P0 | S0.3, S1.7, S1.8, S1.9 | −S0.3 | ID/state and CLI equality S1.8–9; auth sequencing F1. |
+| FR-2 | 106; P0 | S0.3, S1.11, S1.18, S1.19, S1.20, S2.10, S2.16 | −S0.3 | Concurrent outcomes S2.16; eligibility F2. |
+| FR-3 | 107; P0 | S0.17, S1.26, S4.14, S5.17, S6.7, S6.11 | −S0.17, S5.17, S6.7; `all P0 stories` is not an ID | S6.11 calls full case; gate holes F1. |
+| FR-4 | 108; P0 | S0.8, S1.17, S4.12, S4.13 | −S0.8 | Cross-tier matrix and local CLI S4.13, subject to AI-4. |
+| FR-5 | 109; P0 | S0.8, S4.9, S4.10, S4.11 | −S0.8 | S4.9–10 unavailable/denied, not silent success. |
+| FR-6 | 110; P0 | S0.8, S1.14, S1.17, S4.12, S4.13 | −S0.8 | S4.13 tests permitted non-consumer use, not support for both stated paths (F6). |
+| FR-7 | 111; P1 | — | None | Seam only. |
+| FR-8 | 112; P1 | — | None | Seam only. |
+| FR-9 | 113; P0 | S0.7, S1.16, S2.11, S2.15, S2.16 | −S0.7 | Concurrent separate checkouts S2.16; branch S1.16. |
+| FR-10 | 114; P0 | S0.7, S1.10, S1.16, S4.5, S4.8 | −S0.7 | Label/denial S4.5 and S4.8. |
+| FR-11 | 115; P0 | S0.7, S4.1, S4.2, S4.6, S4.8 | −S0.7 | Own checkout and absence S4.1, S4.8; eligibility F5. |
+| FR-12 | 116; P0 | S0.6, S1.12, S1.15, S2.1, S2.17, S6.1 | −S0.6 | Offline/online covered; ineligible registered runners and lease sequencing F2. |
+| FR-13 | 117; P0 | S0.6, S2.5, S2.7, S2.8, S4.11 | −S0.6 | Running cancel S2.7; unconfirmed wait cancellation F4. |
+| FR-14 | 118; P0 | S0.2, S0.6, S2.1, S2.2, S2.4, S2.5, S2.6, S2.12, S2.17 | −S0.2, S0.6 | Fault suite S2.17 and stale epoch S2.2; sequencing F2/F9 and orphan guard F17. |
+| FR-15 | 119; P0 | S0.3, S1.21, S1.22, S1.23, S3.19 | −S0.3 | S1.23 and S3.19 check files/diff/exact SHA. |
+| FR-16 | 120; P0 | S0.9, S1.24, S3.11, S3.12, S3.16, S3.17, S3.22, S4.7 | −S0.9 | Cases split; pre-PR/new-SHA and exit-test gaps F1. |
+| FR-17 | 121; P0 | S0.9, S1.24, S3.4, S3.13, S3.22 | −S0.9 | Final permissions tested; M1 admits unauthorized approvals (F1). |
+| FR-18 | 122; P0 | S0.10, S1.25, S2.13, S3.14, S3.15, S3.16, S3.22 | −S0.10 | One PR and later protection evidence; M1 gate F1. |
+| FR-19 | 123; P0 | S0.10, S1.25, S6.11 | None | Pilot repo on selected host in S6.11. |
+| FR-20 | 124; P1; becomes P0 if option set 3 resolves to A before HLD approval | S0.10, S5.16, S5.17 | −S0.10; condition quoted in matrix, no priority change | Both hosts on same rules if selected; timing/exit wiring F11. |
+| FR-21 | 125; P0 | S0.9, S1.10, S3.5, S3.6, S4.3 | −S0.9 | Different decisions on two repos S3.6. |
+| FR-22 | 126; P0 | S0.9, S0.11, S1.11, S3.7, S3.12, S3.20, S4.11 | −S0.9, S0.11 | Audit failure at approval tested; at tool grant not tested (F3). |
+| FR-23 | 127; P0 | S0.11, S3.5, S3.8, S3.9 | −S0.11 | Reconstructs fields S3.9; full event coverage and authorization before commit F3. |
+| FR-24 | 128; P0 | S0.9, S2.9, S4.4, S5.1 | −S0.9 | Disconnected timeout S2.9; excess queue S5.1. |
+| FR-25 | 129; P0 | S0.9, S5.2, S5.3, S5.4, S5.5, S5.6 | −S0.9 | Warning, cap and opaque cases S5.4–6. |
+| FR-26 | 130; P0 | S0.4, S3.1, S3.2, S3.4, S3.22 | −S0.4 | Final role checks S3.2/S3.4; M1 sequencing F1. |
+| FR-27 | 131; P0 | S0.3, S1.6, S1.19, S1.23, S3.21, S6.9 | −S0.3 | Scripted workflow S3.21, docs-only replay S6.9. |
+| FR-28 | 132; P0 | S0.5, S1.9, S1.20, S2.8, S3.19, S6.11 | −S0.5 | Distributed: start S1.20, cancel S2.8, diff/gate/PR S3.19; S6.11 alone isn't the full comparison. |
+| FR-29 | 133; P0 | S0.12, S5.7, S5.8, S5.9 | None | Unsupported version and unknown executor checked; packaging fidelity below. |
+| FR-30 | 134; P1 | — | Matrix appends `Enterprise, contingent on PRD Assumption 1` | No story; PRD condition in R134, no scope change. |
+| FR-31 | 135; P0 | S0.13, S1.3, S1.5, S6.1, S6.8, S6.11 | −S0.13 | Guided clean Compose first run S6.11. |
+| FR-32 | 136; P0 | S0.16, S5.14, S5.15 | −S0.16 | Negative network test and positive counters/status/fields. |
+| FR-33 | 137; withdrawn, see Review log | — | Matrix wording `withdrawn in PRD-000` | No story, as required. |
+| FR-34 | 138; P0 | S0.4, S1.6, S3.2 | −S0.4 | S1.6 plus role behavior S3.2. |
+| NFR-1 | 144; P0 | S0.13, S6.8, S6.10, S6.12 | −S0.13 | Correct measured rule in stories; release exit does not require it (F11). |
+| NFR-2 | 145; P0 | S0.15, S5.12, S5.13, S6.12 | −S0.15 | Per-stage cold/warm median/tail plus pilot report. |
+| NFR-3 | 146; P0 | S0.2, S0.17, S1.8, S2.17, S3.18 | −S0.2, S0.17 | Restore task/recovery S2.17 and no auto-pass S3.18. |
+| NFR-4 | 147; P0 | S0.7, S4.1, S4.2, S4.5, S4.8 | −S0.7 | S4.8 verifies mounts and policy denial on runner. |
+| NFR-5 | 148; P0 | S0.4, S0.11, S1.13, S1.14, S2.3, S3.4, S3.10, S5.15 | −S0.4, S0.11 | Credential denials S3.4, redaction S3.10; unscoped earlier builds F1; missing client TLS F16. |
+| NFR-6 | 149; P0 | S0.4, S3.3 | −S0.4 | S3.3 tests cross-team reads; absent before M3 (F1). |
+| NFR-7 | 150; P0 | S4.14, S6.11 | None | S6.11 no paid account or licence. |
+| NFR-8 | 151; P0 | S0.14, S1.4, S2.14, S6.2, S6.3, S6.4, S6.5, S6.6 | −S0.14 | S6.6 drill; pre-backup freeze sequencing F7. |
+| NFR-9 | 152; P0 | S0.1, S1.1, S1.2, S6.7, S6.11 | −S0.1 | S6.11 clean, S6.7 release licence boundary; AI-11 sequencing F8. |
+| NFR-10 | 153; P0 | S0.11, S1.11, S3.8, S3.20, S5.10, S5.11 | −S0.11 | S3.20 matches direct test; event atomicity outside approval F3. |
+
+### 2. Decision fidelity
+
+Script: literal substring search of every double-quoted decision; semicolon-separated results follow quote order. HLD search excludes its review log; source-status rows checked against the identified doc (P12 script also found PRD review-log occurrences, irrelevant to the status).
+
+| Item | Plan line | Literal search result | Story fidelity |
+|---|---|---|---|
+| Source status | P11/P12 | H3; H3; H3 / R3; R3 | Holds, see check 4. |
+| Source inputs/format | P13/P16 | P13 **NOT FOUND** as a contiguous quote (ellipsis; underlying words H8); P16 **NOT FOUND in HLD**, found README 10 | No architecture change. |
+| D1 | P20 | H217; H267 | First-party baseline retained; AI-2 before approvals. |
+| D2 | P21 | H42 | S1.3/S1.5/S6.1: single server/runner binary, Postgres in Compose, remote runner. Image detail under check 3. |
+| D3 | P22 | **NOT FOUND** verbatim (ellipsis replaces H356 parenthetical) | S1.16/S4.1/S4.5 retain tier separation and no host mount; S2.15 only tests escapes, not all forbidden path forms (F14). |
+| D4 | P23 | H389; H391; H391; H391 | Conditional default/egress retained; eligibility omission F5. |
+| D5 | P24 | H439; H441; H441 | Outbound runner claims correctly; eligibility and partial lease sequencing F2. |
+| D6 | P25 | H489; H491; H542 | Baton-owned D6 via S0.8, then S1.17/S4.12; permission behavior F3–F4, billing F6. |
+| D7 | P26 | H548; H550; H550 | Postgres and at-least-once outbox retained; no competing store/queue; atomicity F3. |
+| D8 | P27 | H583; diagram first hits: Queued H554, Claimed H555, Preparing H556, Running H557, AwaitingInput H558, Candidate H560, Checks H561, Review H562, PROpen H563, MergeEligible H564, NeedsReconciliation H568, Cancelled H573, TimedOut H575, Failed H572, Rejected H580 | Canonical names preserved; cancellation/timeout semantics F4. |
+| D9 | P28 | H585 | S5.10–11 separate payloads, purge audited, no basic audit deletion, exact retention default left to S0.9/AI-7. |
+| D10 | P29 | H649; H649; H649 | SHA-bound two phases intended, early PR gate/staleness acceptance F1. |
+| D11 | P30 | H662; H662 | S3.5–7 retain declarative override/hash/deny. |
+| D12 | P31 | H677; H677 | Database role negative test S3.8; transaction coverage F3. |
+| D13 | P32 | H687; H687 | S2.9/S4.4/S5.1–6 place limits on runner and concurrency/accounting on server. |
+| D14 | P33 | H710; H712 | S0.10/S5.16–17 conditional; release wiring F11. |
+| D15 | P34 | H720; H720 | S1.13, S1.21–22 server-only writable identity. |
+| D16 | P35 | H739; H737; H737; H737 | S0.2/4 and S3.1–4 keep single org + scoped reads; S0.2 says every record has org identifier, not a schema name. M1 permissive user path F1. |
+| D17 | P36 | H764; H764; H774; H774 | S0.12/S5.7–9/S6.7 versioned/admin-granted seam and no runtime server loads, no build of later optional host; explicitly require the H764 compiled-in rule in the LLD (check 6). |
+| D18 | P37 | H795; H803; H803; H803 | Compose, explicit forward migration, dry-run/backup/restore. Freeze acceptance can still admit a backup-window write (F7); version compatibility uses a protocol rather than a build (F18). |
+
+### 3. Decisions reserved for LLDs
+
+Script: scan of all 125 story rows (title, Traces, acceptance) for technology/mechanism names, protocol/credential/record words and path/literal candidates, followed by manual review of every row for unlabelled commitments. Logical records and display values below are not SQL identifiers or configuration keys.
+
+| Candidate / script match IDs | HLD source or disposition |
+|---|---|
+| Implementation language, framework, library: `NONE` | Stack reserved by S0.1. No concrete schema/table/column names or config keys found. `schema`: S0.2, S0.14, S1.4; `schema version`: S0.14, S1.4 (H803); schema choice remains S0.2. |
+| Compose: S0.13, S1.5, S1.26, S6.8, S6.11; Postgres: S0.14, S1.5, S6.2 | H42, H550, H795. S1.5 `from one image` (P120) is ambiguous: H795 specifies the same image for additional **runners**, not for Postgres. If one product image for server+runner is meant, name those two; packaging decision belongs to S0.13 (F10). |
+| DCO S0.1/S1.2; GitLab S5.16; outbox S0.2/S1.22/S1.25; skip-locked S0.2 | H760; H710 conditional/AI-5 and AI-8; H550 for both Postgres mechanisms. |
+| rootless and seccomp S0.7/S4.2; user-namespaced S4.2; runtime/OS choice S0.7 | H137, H387, H795; exact runtime/runner OS open and assigned to S0.7. `rootless` alone in S0.7 drops H795's allowed alternative, see F15. |
+| OIDC S0.4/S0.17/S1.6; delegated token S0.5/S1.9; install token S0.4/S3.1; API key/secret references S0.4/S1.14/S4.12 | H31, H491, H737; exact OIDC flow/storage delegated to S0.4. H818 also fixes TLS, not a cipher/library; TLS is absent from the story rows (F16). |
+| Webhook(s) S0.10/S3.14/S3.15, polling S0.10/S3.15; versioning S0.6/S6.5 | H710, H803; no concrete payload format in a code row. |
+| Wire format S0.3; commit-transfer format S0.6; extension protocol S0.12; metrics exposure format S0.15; heartbeat destination S0.16, fields S6.8 | Open; inventoried as topics assigned to DOCs, not invented concrete values (H441/H764/H843/R136). |
+| Org identifier S0.2; idempotency keys S0.2; sequence numbers S0.2/S1.18; fencing/epoch S1.15/S2.2/S2.4; lease expiry S2.3 | H739, H550, H441/H583. |
+| Actor/action/decision/reason S3.9; candidate SHA S0.11/S1.24/S3.9/S3.11/S4.7; policy version/hash S0.11/S1.10/S3.9 | H677, H649, H662. No physical column spellings mandated. |
+| Executor IDs S2.12; queue depth, lease expiries, gate outcomes, ready-to-prompt S0.15/S5.12 | H841/H843. |
+| Display literals `trusted-local` S1.16/S4.5/S4.6; `unknown` S5.6 | H356/391; H687/R129. State list in check 2. |
+| Path scan: no literal file paths in any story row; `checkout root` S2.15 | H356 requires confinement; root location from S0.7. P81 paths are format conventions, not product paths. No script selected a concrete path or wire format. |
+| Allow-list/tool S0.1/S1.1; allowlists S4.3; command surface S0.5; config/secrets S0.13; retention values S0.9; threshold S5.4/cap S5.5 | Open values assigned to DOCs; mechanisms H760, H391, H662/H687, H585. No hard-coded names or values. |
+| Other implementation-level readings from manual review | `unmatched` orphan disposal (S2.12) is an unsupported algorithmic condition, not an identifier (F17); treating `distinct` as a choice in S0.9 is legitimate only beyond the fixed authorized reviewer invariant (F1). `protocol version` used as proxy for `runner version` (S6.5) requires an actual previous-build check (F18). |
+
+### 4. HOLD and gates
+
+Script compared `Owner`, subject and `Blocks` text parsed from H884–895 to P45–56. Output: owner is **exact for 12/12**, blocker wording differs **12/12** (plan uses its own downstream-impact column). Corrective distinction: the exact source blocker and downstream plan mapping are different columns (F12). No executable lacking direct AI-1: `[]`.
+
+| Gate | P/H lines | Owner / subject / source Blocks literal | Direct story gates printed by script | Operational result |
+|---|---|---|---|---|
+| AI-1 | 45/884 | exact / exact / different: “HLD-000 approval (VISION §How we will know) and every UNRUN assumption.” | Every CODE, TEST, OPS | PASS: P3/P82/P330 retain hold. P3 requires maintainer to lift it, not merely an experiment starting. |
+| AI-2 | 46/885 | exact / different / different: “§2 choice among Options 1, 3 and 4.” | S0.1, S0.6, S0.7 | Drafting allowed; inherited for runner work; P331 explicitly replans. |
+| AI-3 | 47/886 | exact / different / different: “approval of §3.2's conditional default, pilot eligibility and whether the microVM tier enters the alpha (Assumption 2).” | S4.6, S6.12 | Pilot scenarios S4.14/S6.11 can start without this result if settings/fixtures do not inherit S4.6; split dev-only and actual pilot evidence (F5/F11). |
+| AI-4 | 48/887 | exact / different / different: “§4 first agent pair (PRD option set 2).” | S0.8, S1.17, S4.12 | Correct selection gate; adapter tests inherit. |
+| AI-5 | 49/888 | exact / exact / different: “approval of §7.1 Option 1 or 2 and FR-20 priority (PRD option set 3).” | S0.10, S5.16, S5.17 | Gates first-host spec and second-host work; source's timing needs explicit carry-through (F11). |
+| AI-6 | 50/889 | exact / exact / different: “alpha release and §10.1's install target.” | S6.12 | Rootless-spike evidence is in S0.7 itself, inherited by M4; don't gate the producer on itself. NFR-1/2 report can be missed by exit (F11). |
+| AI-7 | 51/890 | exact / exact / different: “the §5 retention default.” | S5.11 | Correct: S0.9 owns/defaults and closes; purge waits. |
+| AI-8 | 52/891 | exact / exact / different: “§7.1 Option 1's GitLab mapping (FR-20).” | S5.16, S5.17 | Correct: S0.10 owns mapping closure and the two consumers wait. |
+| AI-9 | 53/892 | exact / different / different: “reassessing §3.2 Option 4 and an out-of-process Wasm host under §9.1 Option 1.” | none | Deferred options, not an omitted alpha gate. |
+| AI-10 | 54/893 | exact / different / different: “whether §5 Option 5 may ship as an optional backend under I2.” | none | Optional backend not built. |
+| AI-11 | 55/894 | exact / exact / different: “admission of each core dependency under I2 (NFR-9).” | S1.3 | P55 also globally applies to later dependency additions. No gate on its two producers is right; any dependencies of the producers themselves need the maintainer's admission first (F8). |
+| AI-12 | 56/895 | exact / different / different: “closing PRD Open question 5 and VISION Open question 4.” | S4.6 | Does not displace AI-3. S4.6 waits on both, as intended. |
+
+### 5. Dependency graph
+
+Script: parsed `Deps` and `Blocked`, checked references and depth-first cycles, then computed transitive predecessors. A second pass assigned each CODE row one or more subject-specific M0 specs before checking reachability. A generic stack DOC is not a substitute for the relevant spec.
+
+| Probe | Script output / assessment |
+|---|---|
+| Counts | **125**: DOC 20, CODE 86, TEST 14, OPS 5. |
+| M0 | 17 DOC = 17. |
+| M1 | 22 CODE, 1 TEST, 3 OPS = 26. |
+| M2 | 15 CODE, 2 TEST = 17. |
+| M3 | 19 CODE, 3 TEST = 22. |
+| M4 | 11 CODE, 3 TEST = 14. |
+| M5 | 14 CODE, 3 TEST = 17 (15 if second-host branch omitted). |
+| M6 | 5 CODE, 2 TEST, 2 OPS, 3 DOC = 12. |
+| Structural errors | Unknown story/gate `[]`; later milestones `[]`; later rows within same milestone `[]`; cycles `[]`. |
+| Any transitive DOC | CODE without any predecessor DOC `[]`. Direct DOC: **17/86**: S1.4, S1.6, S1.7, S1.9, S1.10, S1.11, S1.12, S1.16, S1.17, S4.1, S4.12, S5.7, S5.12, S5.14, S5.16, S6.1, S6.2. P84 inaccurately implies direct edges throughout. |
+| Subject-specific DOC closure | **80/86** have all assigned links; six missing pairs: S2.4→S0.7, S2.7→S0.8, S2.9→S0.7, S3.4→S0.6, S4.5→S0.5, S5.4→S0.5. S2.7 needs the adapter stop semantics, not selection of a specific vendor for all cancellation logic. F9. |
+| Explicit acceptance IDs absent in closure | `[(S3.4, S0.6)]`. Its operation allowlist is unresolved without the runner LLD. F9. |
+| Semantic dependency probes | S1.26 reaches S1.17/S1.24/S0.17, not S3.2/S3.11 (F1); S2.17 reaches neither S2.7 nor S2.9; S4.13 reaches S4.12 but not the completed candidate read S1.23; S4.14 reaches neither S4.8 nor S3.17/S3.18; S6.11 reaches neither S2.8 nor S3.19; wire only prerequisites of the test's actual cases (F9). |
+| Effective release-gate links | S4.14 and S6.11: AI-1, AI-2, AI-4, AI-5, AI-11; **no AI-3/AI-12**. S6.12: AI-1, AI-2, AI-3, AI-4, AI-5, AI-6, AI-11. Neither S6.11 nor S6.12 reaches S6.6, S6.9, or conditional S5.17; those are milestone completion requirements, not inherently prerequisites for one clean-install test. F11. |
+
+### 6. Story quality
+
+Script sampled the first, one-third, two-thirds and last story in each milestone (28); defects in S2.12/S2.17/S3.22/S4.14/S6.12 prompted widening to **all 125**. The second pass read every acceptance for one behavior, one scenario suite/artefact or one DOC; the marker screen found **0/100 CODE/TEST missing `tests pass`**. No exact `as appropriate`, `robust`, or `properly` in the story rows. Script candidates and manual adjudication follow; multiple assertions on the same behavior are not independent stories. Every ID in each continuous milestone range was checked; rows without a flagged exception passed the quality screen (this is not an architecture or gate pass).
+
+| Milestone | Initial IDs | Final tally / population | Quality result after widening |
+|---|---|---|---|
+| M0 | S0.1, S0.6, S0.12, S0.17 | 17/17 (S0.1–17) | Each one document with DOC-OK. `supported` in S0.7 delegates a platform choice, not subjective success; retain the allowed runtime alternatives (F15). S0.12 should state the compiled-in provider boundary and locations for the out-of-process seam (H764), not build the deferred host; the summary at P36 sets the correct rule. |
+| M1 | S1.1, S1.9, S1.18, S1.26 | 26/26 (S1.1–26) | `clean` (S1.1) = allow-list compliant; `current` (S1.25) needs an actual SHA at effect time (F1). `nothing else is needed` (S1.5) is unbounded and conflicts with documented prerequisites if literal; clarify topology instead (F10). S1.26 references a runnable harness; its security acceptance is too weak (F1). |
+| M2 | S2.1, S2.6, S2.12, S2.17 | 17/17 (S2.1–17) | `unmatched` (S2.12) does not say what counts as an orphan (F17); `authorised` on artifact reads (S2.14) should resolve to the LLD policy. Independent fault injections can be a suite, but the suite/exit does not provide matching cancel/timeout proof (F9). Confinement scope F14. |
+| M3 | S3.1, S3.8, S3.15, S3.22 | 22/22 (S3.1–22) | `authorised` audit query (S3.9) is observable using repo membership; `current` checks (S3.16) are explicitly tied to SHA. S3.22 is one suite; attach the exact missing/errored gate cases (F1) and external gate dependency (F9). |
+| M4 | S4.1, S4.5, S4.10, S4.14 | 14/14 (S4.1–14) | `supported` runner (S4.8) is defined by S0.7. S4.11 combines tool holds, allow/deny, audit failure coverage and terminal handling; use one permission suspension/resolution behavior with its existing cancel/timeout cases/ties (F3/F4). S4.14 references an observable PRD scenario but could run against ungated pilot scope (F5). |
+| M5 | S5.1, S5.6, S5.12, S5.17 | 17/17 (S5.1–17) | Individual budget assertions, negative extension cases and telemetry checks are observable; S5.12's metric inventory is one metric surface (H843); S5.13 is one command; S5.17 has two host runs of one conditional suite, not two independent behaviors. |
+| M6 | S6.1, S6.5, S6.9, S6.12 | 12/12 (S6.1–12) | `clean` host (S6.11) and `representative` repos (S6.12) must use the PRD prerequisites/AI-6 inputs, not reviewer discretion. S6.8–10 each one document with a reviewer exercise or explicit record fields. Upgrade sequence, prior-runner proof and release evidence need tightening (F7/F18/F11). |
+
+### 7. Scope
+
+Script crossed each story's title, Traces and acceptance against P1/withdrawn IDs, perimeter terms and conditional words; manual sweep covered every excluded item in H106–124 and R157–166.
+
+| Source boundary | Script hits and result |
+|---|---|
+| P1/withdrawn | `S0.10, S5.16, S5.17` reference FR-20; no story hit for FR-7, FR-8, FR-30 or FR-33. No build of those P1 seams. |
+| Second host | S0.10 AI-5; S5.16/S5.17 AI-1/5/8. R124: “becomes P0 if option set 3 resolves to A before HLD approval”. P298 copies it, but P230 only conditions on resolving to A; H710/888 place confirmation before approval. Require explicit approval record and conditional release evidence (F11). |
+| First pair | S1.17/S4.12 `selected pair`, both AI-4; S0.8 waits for written check, downstream tests inherit. H542 first pair remains conditional; use permitted paths, with FR-6 obligations (F6). |
+| Pilot tier | S4.6 explicitly conditional; AI-3/AI-12. S6.12 `pilot tier` AI-3/6. S6.11 `pilot repo` only direct AI-1, no AI-3 in closure; see F5/F11. H131/H138 and H391 can require redesign, not a microVM or no-egress build in this plan. |
+| Tenancy/edition/plugins | Hits: S0.12, S4.12, S6.7, S6.8, S6.11. S4.12 `enterprise` is agent billing, not Enterprise module; other hits enforce packaging/exclusions. No hosted, embedding, multi-org, branding, marketplace or in-server untrusted plugins. P0 versioned seam does not require a shipped external host (R162). |
+| Isolation/agent interaction | Hits: S0.8, S1.17, S2.17, S4.10, S4.12, S4.13, S6.8. No ACP/MCP ingestion, parity or consumer login; `resume`/`steering` are recovery or capability denials. No shipped hostile/microVM, extra OS, provider matrix or guaranteed exfiltration/opaque dollar cap; refusal needs to be enforced (F5). |
+| Merge/clients/ops | Hits: S3.4, S3.16, S3.21, S6.8, S6.11. Negative merge/no desktop/no workflow cluster, not those features. No HA, air-gap, single-user no-Postgres, audit signing/export or alternate clients found. |
+
+### 8. Milestones
+
+Script joined P68–74 with P265–271 by milestone, and enumerated H198–211. Output: 7 matched exits, 14 source workflow steps, 12.0 estimated post-HOLD weeks, M1 claims steps `1 to 5, 8, 10, 11`; P112 expressly omits roles, pre-PR checks, lease expiry, container tier, second adapter and budgets. Manual coverage below distinguishes an intentional thin slice from an invariant violation.
+
+| Milestone / §1 step | Lines | Observability, prerequisite or coverage result |
+|---|---|---|
+| M0 | P68/P265 | Runnable by human status/review search; external gate closure may delay approvals; no code needed. |
+| M1 | P69/P266 | Compose+S1.26 with test OIDC identities and one test repo/agent/runner; measurable one PR. Current thin slice permits unauthorized approval; cannot assume M3 to validate it (F1). |
+| M2 | P70/P267 | Faults and outcomes observable; S2.16/S2.17 do not test the listed cancel/time-limit exits, and no path from S2.17 to their implementations. Test by S2.7/S2.9 or include them in existing suite (F9). |
+| M3 | P71/P268 | Staleness, audit failure, denied runner and reconstructable query are observable; claimed steps 9–13 need actual authorized reviewer/check/status/protection fixtures (F1). No later-milestone implementation required on trusted-local. |
+| M4 | P72/P269 | Isolation+adapter matrix are measurable; “Both agents complete a run on both tiers” is stronger than “produce event streams and diffs” unless termination is also asserted. Full container FR-3 remains testable on a controlled fixture; a pilot needs AI-3 (F5/F9). |
+| M5 | P73/P270 | All explicit outcomes measurable with S5.1/S5.4/S5.9/S5.15; `A reviewer runs` lists extension/telemetry/latency, not the budget proof. Conditional host proof belongs to M5 or release only when eligible (F11). |
+| M6 | P74/P271 | Install and restore observable, using existing stories; proof column names S6.12 but runnable exit omits its benchmark verdict and does not require S5.17 if selected. Complete all required stories and gates (F11). |
+| §1.1 | H198 | Yes: S1.7–9/S1.20, configured repo plus task/run, member role only nominal before M3 (F1). |
+| §1.2 | H199 | Partial: S1.10–11 policy/audit/enqueue; money reservation intentionally in S5.2. |
+| §1.3 | H200 | Partial: outbound claim/spec/epoch/credentials S1.12–15; eligibility and lease safety F2. |
+| §1.4 | H201 | Yes for one tier: S1.16 worktree; container intentionally M4. |
+| §1.5 | H202 | Yes: S1.17–19 adapter and ordered events. |
+| §1.6 | H203 | Deferred to S4.11; happy-path fixture need not prompt. |
+| §1.7 | H204 | Deferred to M2/M4; happy-path fixture need not cancel or time out. |
+| §1.8 | H205 | Yes: S1.21–23 runner commit transfer, server push, diff and recorded SHA. |
+| §1.9 | H206 | No: P112 sets zero required checks; qualify it as a synthetic no-check policy, not a bypass where checks are required (F1). |
+| §1.10 | H207 | Partial: SHA and second identity S1.24/exit, but role authorization omitted, rejection deferred (F1). |
+| §1.11 | H208 | Partial: S1.25 deduplicates PR and requires approval; fail-closed gate bit beyond user approval not established until M3 (F1). |
+| §1.12 | H209 | Outside task→PR exit; S3.14–17 add host checks/status and staleness. |
+| §1.13 | H210 | Outside task→PR exit; host-only human merge in M3 scenario, no baton merge. |
+| §1.14 | H211 | Deferred: S2.11 disposal and S3.9 audit query; do not claim M1 reports whole lifecycle. |
+
+### 9. Format and hygiene
+
+| Probe | Command or script output | Result |
+|---|---|---|
+| README format | headings: P5 Source design docs; P39 Gates before code; P58 Milestones; P76 Stories; P250 Verification strategy; P324 Risks; P340 Review log | All README 7–8 sections in order; additional gate section does not displace any. Story table has IDs, titles, acceptance and dependencies. README 10 read with H3's express draft permission. |
+| Body byte cap | `LC_ALL=C awk '/^## Review log/{exit} {print}' <plan> \| wc -c` → `54340`; file `54441` bytes, 342 lines | PASS ≤60,000 bytes. |
+| HTML comments | delimiter `rg`: exit 1; no stdout | PASS. |
+| Review log | P341–342 header and separator only; data rows: `0` | PASS. |
+| Required private-token scan | specified case-insensitive `rg`: exit 1; no stdout | PASS. |
+| Required absolute-home scan | specified path `rg`: exit 1; no stdout | PASS. |
+| Milestone names/counts and story IDs | mismatches `[]`; undefined references `[]`; duplicate story definitions `[]` | PASS across milestone table, story headings, story references and verification. |
+| Run states | `Near state forms: []`; all 15 diagram state spellings present; `merged` stays lowercase, as in H583 | PASS. Lower-case casefold hits like `candidate`, `failed`, `running` and `review` were inspected as ordinary prose, not alternate state labels. |
+| Tiers | scan hits: `trusted-local` (P22/23/69/131/200/201/266); `hardened container` and `container tier`; `microVM` and `microVM tier` | PASS on identifier spelling; the latter two labels vary only as prose, as in H356/391/820–824. No different runtime tier identifier is assigned. |
+
+## What is strong
+
+- P3/P82/P330 carry H3's HOLD expressly; all 105 executable stories carry direct AI-1, and DOC drafts are distinguished from permission to execute code.
+- The plan makes most provisional choices visible: written vendor check before the pair, survey and primary-source verification before the second Git host, and pilot threat review/PRD question before the default. Runtime, wire and schema choices are mostly left to named LLDs.
+- The DAG is structurally clean and spans a coherent task-to-PR slice through CLI/API, Postgres, runner, executor, adapter and host. Red/green verification, golden fixtures, real Postgres privilege tests, and named fault cases are concrete.
+- All PRD entries have an accounting, and all unconditional P0 IDs have a named story. The plans for idempotent host effects, separate purgeable payloads, no runtime extension loading, and a clean core-only build preserve important constraints.
+
+## Learnings / mistakes
+
+- My first whole-plan view omitted text. I caught both truncation markers, then re-read contiguous ranges through line 342; never infer completeness from a rendered full-file command.
+- A graph pass initially showed every CODE story reached some DOC. Checking the relevant document instead exposed missing paths such as S3.4→S0.6; reachability to any DOC is not specification coverage.
+- The hygiene-table insertion emitted a Python invalid-escape warning for a Markdown pipe. I verified the saved text and used raw strings or literal shell input for such snippets thereafter.
+- My first evidence pass found punctuation added inside several quotation marks. I moved it outside and checked exact source spans; a faithful fragment must match the source bytes, not just its meaning.
